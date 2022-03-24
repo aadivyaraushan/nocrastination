@@ -1,54 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, ImageBackground, Pressable } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AuthenticationScreen from "./screens/AuthenticationScreen.js";
+import LoginScreen from "./screens/Login.js";
+import SignupScreen from "./screens/Signup.js";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-       <ImageBackground style={styles.bg} source={require("./assets/background.png")}>
-          <Image source={require("./assets/loginBanner.png") } style={styles.banner} />
-       	     <View style={styles.buttonsContainer}>
-	        <Pressable>
-                   <Image source={require("./assets/buttons/login.png")} style={styles.buttons} />
-	        </Pressable>
-	        <Pressable>
-                   <Image source={require("./assets/buttons/signup.png")} style={styles.buttons} />
-	        </Pressable>
-	        <Pressable>
-	           <Image source={require("./assets/buttons/classcode.png")} style={styles.buttons}/>
-	        </Pressable>
-	  </View>
-	  </ImageBackground>
-    </View>
+    <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+            <Stack.Screen name="auth" component={AuthenticationScreen} />
+	    <Stack.Screen name="login" component={LoginScreen} />
+	    <Stack.Screen name="signup" component={SignupScreen} />
+	</Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center"
-  },
-  banner: {
-    resizeMode: "contain",
-    position: "absolute",
-    top: 0,
-    width: "100%",
-    height: "10%",
-    backgroundColor: "black"
-  },
-  bg: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "flex-start",
-  },
-  buttons: {
-    marginTop: 50,
-    width: "100%",
-    resizeMode: "contain"
-  },
-  buttonsContainer: {
-    top: 100,
-  }
-});
+const styles = StyleSheet.create({});
