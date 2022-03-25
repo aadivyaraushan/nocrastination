@@ -1,16 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { TextInput, StyleSheet, Text, View, Image, ImageBackground, Pressable } from 'react-native';
 import { useState } from "react";
-import {auth} from "../firebase.js";
-
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 function Login() {
   
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
+  const auth = getAuth();
   
   const handleSignUp = () => {
-     auth
-     .createUserWithEmailAndPassword(email, password)
+     createUserWithEmailAndPassword(auth, email, password)
      .then((userCredentials) => {
         const user = userCredentials.user;
 	console.log(user.email);
