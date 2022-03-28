@@ -2,26 +2,49 @@ import { StatusBar } from 'expo-status-bar';
 import { TextInput, StyleSheet, Text, View, Image, ImageBackground, Pressable } from 'react-native';
 import { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-function Login() {
-  
+import { collection, setDoc, getFirestore, doc } from "firebase/firestore";
+import { auth, db } from "../firebase.js";
+
+function Signup() {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
-  const auth = getAuth();
+  const [displayName, onChangeDisplayName] = useState("");
   
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+	console.log(auth, db);
      createUserWithEmailAndPassword(auth, email, password)
      .then((userCredentials) => {
         const user = userCredentials.user;
 	console.log(user.email);
      })
      .catch(error => alert(error.message));
+
+     try {
+		await setDoc(doc(db, "users", email), {
+	   		coins: 0,
+	   		currentXp: 0,
+	   		diamonds: 0,
+	   		displayName: "",
+			email: email,
+	   		level: 1,
+	   		multiplier: 1,
+	});
+	console.log("Document written with ID: ", email);
+     } catch(e) {
+       console.log("Error adding document: ", e);
   }
-  
+}  
   return (
     <View style={styles.container}>
        <ImageBackground style={styles.bg} source={require("./../assets/background.png")}>
           <Image source={require("./../assets/signupBanner.png") } style={styles.banner} />
        	     <View style={styles.inputFieldsContainer}>
+	        <TextInput
+	            style={styles.inputFields}
+	            onChangeText={onChangeDisplayName}
+	            value={displayName}
+	            placeholder="Display Name"
+	        />
 	        <TextInput
                     style={styles.inputFields}
 	            onChangeText={onChangeEmail}
@@ -40,9 +63,9 @@ function Login() {
 	  </ImageBackground>
     </View>
   );
-}
 
-export default Login;
+}
+export default Signup;
 
 const styles = StyleSheet.create({
   container: {
