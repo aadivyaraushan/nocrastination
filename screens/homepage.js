@@ -29,13 +29,13 @@ const app = ()=>{
          </TouchableWithoutFeedback>
 
            <View style={styles.container_2}>//pls align to end
-           <Image source = {require('../assets/Quests_icon.png')}></Image>
-           <Image source = {require('../assets/Settings_icon.png')}></Image>
-           <Image source = {require('../assets/Shop_icon.png')}></Image>
-           <Image source = {require('../assets/Social_Icon.png')}></Image>
-        
+           <Button><Image source = {require('../assets/Quests_icon.png')}></Image></Button>
+           <Button><Image source = {require('../assets/Settings_icon.png')}></Image></Button>
+           <Button> <Image source = {require('../assets/Shop_icon.png')}></Image></Button>
+           <Button><Image source = {require('../assets/Social_Icon.png')}></Image></Button>
 
            </View>
+
            </ImageBackground>
        </View>
     );
