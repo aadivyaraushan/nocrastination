@@ -5,7 +5,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, setDoc, getFirestore, doc } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
 
-function Signup() {
+function Signup({ navigation }) {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [displayName, onChangeDisplayName] = useState("");
@@ -29,9 +29,11 @@ function Signup() {
 	   		level: 1,
 	   		multiplier: 1,
 	});
-	console.log("Document written with ID: ", email);
-     } catch(e) {
-       console.log("Error adding document: ", e);
+	 	console.log("Document written with ID: ", email);
+	 	navigation.navigate('homepage');
+     } 
+	 catch(e) {
+      	console.log("Error adding document: ", e);
   }
 }  
   return (

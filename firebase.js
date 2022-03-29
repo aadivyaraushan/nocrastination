@@ -1,22 +1,25 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import firebase from "firebase/compat/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyChAt4y0DE4VhmakVCTalEVIZcZ1FgfEOA",
-  authDomain: "nocrastination-da9a5.firebaseapp.com",
-  projectId: "nocrastination-da9a5",
-  storageBucket: "nocrastination-da9a5.appspot.com",
-  messagingSenderId: "904825002813",
-  appId: "1:904825002813:web:15ff349438d3f9d0f24354",
-  measurementId: "G-HSDMJ2YB37T"
+  apiKey: "AIzaSyA6MUueg3R66OnvCcBnNLkYoJ14qlsSmIc",
+  authDomain: "nocrastination-d1741.firebaseapp.com",
+  projectId: "nocrastination-d1741",
+  storageBucket: "nocrastination-d1741.appspot.com",
+  messagingSenderId: "62008867834",
+  appId: "1:62008867834:web:dc5f198fe532c6cd0dc243",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
- 
+
 const auth = getAuth(app);
+
 const db = getFirestore(app);
 
-export { auth };
+export { auth, db }
