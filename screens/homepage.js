@@ -10,6 +10,7 @@ const app = ()=>{
         padding: 0
       }}>
           <ImageBackground source = {require('./assets/App_homepage_background.png')}>
+          //header
            <View style={styles.container_1}>
             //image 1
             <Image source = {require('../assets/x.jpg')}></Image>
