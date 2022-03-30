@@ -1,8 +1,16 @@
 import { StyleSheet, View, Text, Image } from "react-native";
 import Coin from ".././assets/coin.png";
+import { loadAsync, useFonts  } from "expo-font";
 
 function Topbar()
 {
+	const [loaded] = useFonts({
+		RetroGaming: require(".././assets/fonts/RetroGaming-Regular.ttf"),
+	});
+
+	if(!loaded)
+		return null;
+	
 	return (
 		<View style={styles.header}>
 			<View style={styles.levels}>
@@ -47,7 +55,8 @@ const styles = StyleSheet.create({
 		width: 40,
 		height: 40,
 		textAlign: "center",
-		marginVertical: "auto"
+		marginVertical: "auto",
+		fontFamily: "RetroGaming"
 	},
 	levels: {
 		display: "flex",
@@ -71,14 +80,16 @@ const styles = StyleSheet.create({
 		color: "white",
 		textAlign: "center",
 		padding: 0,
-		fontSize: 20
+		fontSize: 15,
+		fontFamily: "RetroGaming"
 	},
 	icon: {
 		width: 30,
 		height: 30
 	},
 	iconText: {
-		color: "white"
+		color: "white",
+		fontFamily: "RetroGaming"
 	}
 });
 
