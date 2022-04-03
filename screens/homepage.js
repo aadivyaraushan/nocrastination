@@ -31,17 +31,19 @@ const app = ()=>{
 
            <View style={styles.container_2}>//pls align to end
            <Button><Image source = {require('../assets/Quests_icon.png')}></Image></Button>
+           <View style={styles.container_2}>//pls align to end
+           <Button><Image source = {require('../assets/Quests_icon.png')}></Image></Button>
            <Button><Image source = {require('../assets/Settings_icon.png')}></Image></Button>
            <Button> <Image source = {require('../assets/Shop_icon.png')}></Image></Button>
            <Button><Image source = {require('../assets/Social_Icon.png')}></Image></Button>
 
            </View>
+           </View>
 
            </ImageBackground>
        </View>
-    );
-}
-export default app;
+    )};
+    export default app;
 
 const styles = StyleSheet.create(
     {
@@ -59,6 +61,6 @@ const styles = StyleSheet.create(
         alignContent : "flex-end",
         paddingBottom : Platofrm.OS === "android"?StatusBar.currentHeight:0
        }
-
-    }
-);
+      }
+    );
+      
