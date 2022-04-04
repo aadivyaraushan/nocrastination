@@ -2,23 +2,37 @@ import { StatusBar } from 'expo-status-bar';
 import { TextInput, StyleSheet, Text, View, Image, ImageBackground, Pressable } from 'react-native';
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
+import { useSelector, useDispatch } from "react-redux";
+import { setD } from ".././redux/actions.js";
 
+let user = null;
 
-function Login() {
-  
-  const [email, onChangeEmail] = useState("");
-  const [password, onChangePassword] = useState("");
+function Login({navigation}) {
+	
+  const {email, displayName, level, coins, xp, diamonds, multiplier} = useSelector(state => state.userReducer); 
+	
+  const dispatch = useDispatch(); 
+  // const [email, onChangeEmail] = useState("");
+  // const [password, onChangePassword] = useState("");
 
   const auth = getAuth();
-
-  const handleLogin = () => {
-      signInWithEmailAndPassword(auth, email, password)
+  const db = getFirestore();
+  const handleLogin = async () => {
+      
+	signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
-          const user = userCredentials.user;
+          user = userCredentials.user;
 	  console.log("Logged in with: " + user.email);
       })
-      .catch(error => alert(error.message));
-  }
+      .catch(error => alert(error.message));	
+	const docRef = doc(db, "users", user.email);
+	const docSnap = await getDoc(docRef);
+	if(docSnap.exists())
+	    console.log("Document data: ", docSnap.data());
+	else
+		console.log("No such document!");
+}
 
   return (
     <View style={styles.container}>
@@ -46,6 +60,7 @@ function Login() {
 }
 
 export default Login;
+export { user };
 
 const styles = StyleSheet.create({
   container: {

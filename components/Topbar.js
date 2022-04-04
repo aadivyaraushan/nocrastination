@@ -1,15 +1,20 @@
 import { StyleSheet, View, Text, Image } from "react-native";
 import Coin from ".././assets/coin.png";
 import { loadAsync, useFonts  } from "expo-font";
+import { user } from ".././screens/Signup.js";
+import { doc, onSnapshot, getFirestore } from "firebase/firestore";
 
 function Topbar()
 {
+	console.log("User: ", user);
 	const [loaded] = useFonts({
 		RetroGaming: require(".././assets/fonts/RetroGaming-Regular.ttf"),
 	});
 
 	if(!loaded)
 		return null;
+	
+	const db = getFirestore();
 	
 	return (
 		<View style={styles.header}>
