@@ -34,16 +34,15 @@ function Signup({ navigation }) {
 
     try {
       const docRef = doc(db, "users", email);
-      await setDoc(docRef),
-        {
-          coins: 0,
-          currentXp: 0,
-          diamonds: 0,
-          displayName: "",
-          email: email,
-          level: 1,
-          multiplier: 1,
-        };
+      await setDoc(docRef, {
+        coins: 0,
+        currentXp: 0,
+        diamonds: 0,
+        displayName: "",
+        email: email,
+        level: 1,
+        multiplier: 1,
+      });
       console.log("Document written with ID: ", email);
       navigation.navigate("homepage");
     } catch (e) {
