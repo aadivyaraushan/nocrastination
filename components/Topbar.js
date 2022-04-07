@@ -1,13 +1,11 @@
 import { StyleSheet, View, Text, Image } from "react-native";
-import Coin from ".././assets/coin.png";
-import { loadAsync, useFonts } from "expo-font";
-import { user } from ".././screens/Signup.js";
-import { doc, onSnapshot, getFirestore } from "firebase/firestore";
-import { useDispatch, useSelector } from "react-redux";
-import { setLevel } from "../redux/actions";
+import { useFonts } from "expo-font";
+import { getFirestore } from "firebase/firestore";
+import { useContext } from "react";
+import { UserContext } from "../UserContext";
 
 function Topbar() {
-  console.log("User: ", user);
+  const { user, setUser } = useContext(UserContext);
   const [loaded] = useFonts({
     RetroGaming: require(".././assets/fonts/RetroGaming-Regular.ttf"),
   });
@@ -15,21 +13,19 @@ function Topbar() {
   if (!loaded) return null;
 
   const db = getFirestore();
-  const { email, displayName, level, coins, xp, diamonds, multiplier } =
-    useSelector((state) => state.useReducer);
 
   // Level XP calculations
-  const xpToNextLevel = level * 100 * multiplier;
+  const xpToNextLevel = user["level"] * 100 * user["multiplier"];
 
   return (
     <View style={styles.header}>
       <View style={styles.levels}>
         <View style={styles.level}>
-          <Text style={styles.levelText}>{level}</Text>
+          <Text style={styles.levelText}>{user["level"]}</Text>
         </View>
         <View style={styles.progress}>
           <Text style={styles.progressText}>
-            {xp}/{xpToNextLevel}
+            {user["currentXp"]}/{xpToNextLevel}
           </Text>
         </View>
       </View>
@@ -39,7 +35,7 @@ function Topbar() {
           resizeMode={"contain"}
           source={require(".././assets/ruby.png")}
         />
-        <Text style={styles.iconText}>{diamonds}</Text>
+        <Text style={styles.iconText}>{user["diamonds"]}</Text>
       </View>
       <View style={styles.diamonds}>
         <Image
@@ -47,7 +43,7 @@ function Topbar() {
           resizeMode={"contain"}
           source={require(".././assets/coin.png")}
         />
-        <Text style={styles.iconText}>{coins}</Text>
+        <Text style={styles.iconText}>{user["coins"]}</Text>
       </View>
     </View>
   );

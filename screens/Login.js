@@ -8,35 +8,36 @@ import {
   ImageBackground,
   Pressable,
 } from "react-native";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getDoc, doc } from "firebase/firestore";
-import { useSelector, useDispatch } from "react-redux";
-import { BottomBar } from "../components/BottomBar.js";
+import { getDoc, doc, getFirestore } from "firebase/firestore";
+import BottomBar from "../components/BottomBar.js";
+import { UserContext } from "../UserContext.js";
 
-let user = null;
+let userCred = null;
 
 function Login({ navigation }) {
-  const { email, displayName, level, coins, xp, diamonds, multiplier } =
-    useSelector((state) => state.userReducer);
-
-  const dispatch = useDispatch();
-  // const [email, onChangeEmail] = useState("");
-  // const [password, onChangePassword] = useState("");
+  const [email, onChangeEmail] = useState("");
+  const [password, onChangePassword] = useState("");
+  const { user, setUser } = useContext(UserContext);
 
   const auth = getAuth();
   const db = getFirestore();
   const handleLogin = async () => {
-    signInWithEmailAndPassword(auth, email, password)
+    await signInWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
-        user = userCredentials.user;
-        console.log("Logged in with: " + user.email);
+        userCred = userCredentials.user;
+        console.log("Logged in with: " + userCred.email);
       })
       .catch((error) => alert(error.message));
-    const docRef = doc(db, "users", user.email);
+
+    const docRef = await doc(db, "users", userCred.email);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) console.log("Document data: ", docSnap.data());
-    else console.log("No such document!");
+    if (docSnap.exists()) {
+      console.log("Document data: ", docSnap.data());
+      setUser(docSnap.data());
+      navigation.navigate("homepage");
+    } else console.log("No such document!");
   };
 
   return (
@@ -77,7 +78,6 @@ function Login({ navigation }) {
 }
 
 export default Login;
-export { user };
 
 const styles = StyleSheet.create({
   container: {

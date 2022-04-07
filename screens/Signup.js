@@ -8,22 +8,18 @@ import {
   ImageBackground,
   Pressable,
 } from "react-native";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, setDoc, getFirestore, doc } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
-import { useSelector, useDispatch } from "react-redux";
-import { setEmail, setDisplayName } from ".././redux/actions.js";
+import { UserContext } from "../UserContext.js";
 
 function Signup({ navigation }) {
-  const { email, displayName, level, coins, userXp, diamonds, multiplier } =
-    useSelector((state) => state.useReducer);
-  console.log(email, displayName, level, coins, userXp, diamonds, multiplier);
-  // const [email, onChangeEmail] = useState("");
+  const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
-  // const [displayName, onChangeDisplayName] = useState("");
-  // const [user, setUser] = useState();
-  const dispatch = useDispatch();
+  const [displayName, onChangeDisplayName] = useState("");
+  const { user, setUser } = useContext(UserContext);
+
   const handleSignUp = async () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
@@ -34,7 +30,8 @@ function Signup({ navigation }) {
 
     try {
       const docRef = doc(db, "users", email);
-      await setDoc(docRef, {
+
+      const data = {
         coins: 0,
         currentXp: 0,
         diamonds: 0,
@@ -42,9 +39,16 @@ function Signup({ navigation }) {
         email: email,
         level: 1,
         multiplier: 1,
-      });
+      };
+
+      await setDoc(docRef, data);
       console.log("Document written with ID: ", email);
-      navigation.navigate("homepage");
+
+      await setUser(data);
+
+      await navigation.navigate("homepage");
+
+      console.log(user);
     } catch (e) {
       alert("Error: ", e.message);
     }
@@ -62,13 +66,13 @@ function Signup({ navigation }) {
         <View style={styles.inputFieldsContainer}>
           <TextInput
             style={styles.inputFields}
-            onChangeText={(value) => dispatch(setDisplayName(value))}
+            onChangeText={onChangeDisplayName}
             value={displayName}
             placeholder="Display Name"
           />
           <TextInput
             style={styles.inputFields}
-            onChangeText={(value) => dispatch(setEmail(value))}
+            onChangeText={onChangeEmail}
             placeholder="Email"
             value={email}
           />
