@@ -46,7 +46,7 @@ function Signup({ navigation }) {
 
       await setUser(data);
 
-      await navigation.navigate("homepage");
+      navigation.navigate("homepage");
 
       console.log(user);
     } catch (e) {

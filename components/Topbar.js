@@ -12,11 +12,12 @@ function Topbar() {
 
   if (!loaded) return null;
 
+  console.log(user);
+
   const db = getFirestore();
 
   // Level XP calculations
   const xpToNextLevel = user["level"] * 100 * user["multiplier"];
-
   return (
     <View style={styles.header}>
       <View style={styles.levels}>

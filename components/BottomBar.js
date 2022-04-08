@@ -14,19 +14,19 @@ function BottomBar() {
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("settings")} bruyh>
+      <Pressable onPress={() => navigation.navigate("settings")}>
         <Image
           source={require("../assets/settingsIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("shop")} bruyh>
+      <Pressable onPress={() => navigation.navigate("shop")}>
         <Image
           source={require("../assets/shopIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("organisations")} bruyh>
+      <Pressable onPress={() => navigation.navigate("organisations")}>
         <Image
           source={require("../assets/socialIcon.png")}
           style={styles.icon}
