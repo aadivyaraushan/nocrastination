@@ -19,6 +19,7 @@ import Shop from "./screens/Shop";
 import Organisations from "./screens/Organisations";
 import { UserContext } from "./UserContext.js";
 import { useMemo, useState } from "react";
+import AddTask from "./screens/AddTask.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ export default function App() {
           <Stack.Screen name="login" component={LoginScreen} />
           <Stack.Screen name="signup" component={SignupScreen} />
           <Stack.Screen name="homepage" component={Homepage} />
+          <Stack.Screen name="addtask" component={AddTask} />
           <Stack.Screen name="quests" component={Quests} />
           <Stack.Screen name="settings" component={Settings} />
           <Stack.Screen name="shop" component={Shop} />

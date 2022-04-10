@@ -8,27 +8,33 @@ function BottomBar() {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.navigate("quests")}>
-        <Image
-          source={require("../assets/questsIcon.png")}
-          style={styles.icon}
-        ></Image>
-      </Pressable>
-      <Pressable onPress={() => navigation.navigate("settings")}>
-        <Image
-          source={require("../assets/settingsIcon.png")}
-          style={styles.icon}
-        ></Image>
-      </Pressable>
       <Pressable onPress={() => navigation.navigate("shop")}>
         <Image
           source={require("../assets/shopIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
+      <Pressable onPress={() => navigation.navigate("quests")}>
+        <Image
+          source={require("../assets/questsIcon.png")}
+          style={styles.icon}
+        ></Image>
+      </Pressable>
+      <Pressable onPress={() => navigation.navigate("addtask")}>
+        <Image
+          source={require("../assets/addTaskIcon.png")}
+          style={styles.icon}
+        ></Image>
+      </Pressable>
       <Pressable onPress={() => navigation.navigate("organisations")}>
         <Image
           source={require("../assets/socialIcon.png")}
+          style={styles.icon}
+        ></Image>
+      </Pressable>
+      <Pressable onPress={() => navigation.navigate("settings")}>
+        <Image
+          source={require("../assets/settingsIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>

@@ -35,10 +35,12 @@ function Signup({ navigation }) {
         coins: 0,
         currentXp: 0,
         diamonds: 0,
-        displayName: "",
+        displayName: displayName,
         email: email,
         level: 1,
         multiplier: 1,
+        questsToDo: 0,
+        questsDone: 0,
       };
 
       await setDoc(docRef, data);

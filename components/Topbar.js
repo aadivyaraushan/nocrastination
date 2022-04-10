@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     backgroundColor: "#1F2025",
+    position: "absolute",
   },
   level: {
     backgroundColor: "#20A4A4",

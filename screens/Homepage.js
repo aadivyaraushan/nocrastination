@@ -15,9 +15,9 @@ function Homepage({ navigation }) {
   const { user, setUser } = useContext(UserContext);
   // console.log(message);
 
-  const handleBattle = () => {
-    navigation.navigate("quests");
-    console.log("Navigating to quests");
+  const handleQuest = () => {
+    navigation.navigate("Quest");
+    console.log("Navigating to Quest");
   };
 
   return (
@@ -29,10 +29,10 @@ function Homepage({ navigation }) {
         <Topbar />
         <BottomBar />
 
-        <Pressable onPress={handleBattle} style={styles.battleButton}>
+        <Pressable onPress={handleQuest} style={styles.QuestButton}>
           <Image
             source={require(".././assets/buttons/battleButton.png")}
-            style={styles.battleImage}
+            style={styles.QuestImage}
           />
         </Pressable>
       </ImageBackground>
@@ -41,7 +41,7 @@ function Homepage({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  battleButton: {
+  QuestButton: {
     width: "50%",
     alignSelf: "center",
     top: 350,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "column",
   },
-  battleImage: {
+  QuestImage: {
     resizeMode: "contain",
     width: "100%",
     alignSelf: "center",
