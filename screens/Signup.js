@@ -24,7 +24,6 @@ function Signup({ navigation }) {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         var user = userCredentials.user;
-        console.log("User email: ", user.email);
       })
       .catch((error) => alert(error.message));
 
@@ -44,13 +43,10 @@ function Signup({ navigation }) {
       };
 
       await setDoc(docRef, data);
-      console.log("Document written with ID: ", email);
 
       await setUser(data);
 
       navigation.navigate("homepage");
-
-      console.log(user);
     } catch (e) {
       alert("Error: ", e.message);
     }

@@ -40,7 +40,6 @@ function AuthenticationScreen({ navigation }) {
             />
           </Pressable>
         </View>
-        <BottomBar style={styles.bottomBar} />
       </ImageBackground>
     </View>
   );

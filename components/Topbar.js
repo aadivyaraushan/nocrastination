@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, Image } from "react-native";
 import { useFonts } from "expo-font";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, updateDoc, doc } from "firebase/firestore";
 import { useContext } from "react";
 import { UserContext } from "../UserContext";
 
@@ -12,12 +12,26 @@ function Topbar() {
 
   if (!loaded) return null;
 
-  console.log(user);
-
   const db = getFirestore();
 
   // Level XP calculations
   const xpToNextLevel = user["level"] * 100 * user["multiplier"];
+  const level =
+    user["currentXp"] === 0 ? 1 : Math.floor(xpToNextLevel / user["currentXp"]);
+  updateDoc(doc(db, "users", user["email"]), {
+    level: level,
+  });
+  // setUser({
+  //   coins: user["coins"],
+  //   currentXp: user["currentXp"],
+  //   diamonds: user["diamonds"],
+  //   displayName: user["displayName"],
+  //   email: user["email"],
+  //   level: level,
+  //   multiplier: user["multiplier"],
+  //   questsToDo: user["questsToDo"],
+  //   questsDone: user["questsDone"],
+  // });
   return (
     <View style={styles.header}>
       <View style={styles.levels}>

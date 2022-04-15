@@ -27,16 +27,15 @@ function Login({ navigation }) {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         userCred = userCredentials.user;
-        console.log("Logged in with: " + userCred.email);
       })
       .catch((error) => alert(error.message));
 
     const docRef = await doc(db, "users", userCred.email);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log("Document data: ", docSnap.data());
       setUser(docSnap.data());
       navigation.navigate("homepage");
+      console.log(user);
     } else console.log("No such document!");
   };
 
@@ -71,7 +70,6 @@ function Login({ navigation }) {
             />
           </Pressable>
         </View>
-        <BottomBar />
       </ImageBackground>
     </View>
   );

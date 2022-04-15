@@ -52,8 +52,6 @@ const AddTask = () => {
       questsDone: user["questsDone"],
       questsToDo: user["questsToDo"] + 1,
     });
-    console.log(data.title + " added!");
-    console.log("New user data: " + user);
 
     const userRef = doc(db, "users", user["email"]);
     await updateDoc(userRef, {

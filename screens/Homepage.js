@@ -17,7 +17,6 @@ function Homepage({ navigation }) {
 
   const handleQuest = () => {
     navigation.navigate("Quest");
-    console.log("Navigating to Quest");
   };
 
   return (
