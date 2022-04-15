@@ -67,6 +67,7 @@ const Shop = ()=>{
   var t = 0;
     return (
       <View style = {{flexDirection : "row", flexWrap:"wrap", flex : 1, backgroundColor : "black"}}>
+      <Topbar/>
       <ScrollView style={{ flex: 1 }}
         horizontal={true}
         nestedScrollEnabled={true}
