@@ -64,10 +64,10 @@ const Shop = ()=>{
     "price":doc["price"],
   "level" : doc["level"]})
   })
-  var t = 0;
     return (
-      <View style = {{flexDirection : "row", flexWrap:"wrap", flex : 1, backgroundColor : "black"}}>
-      <Topbar/>
+      <View style = {{flexDirection : "row", flexWrap:"wrap", flex : 1}}>
+        <ImageBackground source = {require("../assets/backgroud.png")}>
+          <Topbar/>
       <ScrollView style={{ flex: 1 }}
         horizontal={true}
         nestedScrollEnabled={true}
@@ -95,7 +95,7 @@ const Shop = ()=>{
           }
           </ScrollView>
       <BottomBar/>
-
+      </ImageBackground>
         
       </View>
   );
