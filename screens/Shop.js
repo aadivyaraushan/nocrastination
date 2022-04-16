@@ -1,136 +1,126 @@
-import { StyleSheet, Text, View, Image,  ImageBackground, ScrollView, Pressable } from "react-native";
-import React from "react";
-import Topbar from '../components/Topbar.js'
-import BottomBar from '../components/BottomBar.js'
-import { useFonts } from 'expo-font';
-import {db} from '../firebase.js';
-import { collection, getDocs } from "firebase/firestore"; 
-//const querySnapshot = async () => {await getDocs(collection(db, "ShopItems"))};
-//shall be used when code is verified to work
-const Shop = ()=>{
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  ScrollView,
+  Pressable,
+} from "react-native";
+import { useState } from "react";
+import Topbar from "../components/Topbar.js";
+import BottomBar from "../components/BottomBar.js";
+import { useFonts } from "expo-font";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
+import { useContext, useEffect } from "react/cjs/react.development";
+import { UserContext } from "../UserContext.js";
+
+const Shop = () => {
   const [loaded] = useFonts({
-    e: require('../assets/fonts/RetroGaming-Regular.ttf'),
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
-  
-  if (!loaded) {
-    return null;
-  }
-  {//querySnapsot acts as replacement for db, shop
-  }
-  const querySnapshot =  [
-    {
-    "name": "shield",
-    "image": require("../assets/coin.png"),
-    "price": "20 coins",
-    "level": "Level : 1",
-    },
-    {
-      "name": "carrot",
-      "image": require("../assets/ruby.png"),
-      "price": "30 coins",
-      "level": "Level : 10",
-      },
-      {
-        "name": "carrot",
-        "image": require("../assets/ruby.png"),
-        "price": "30 coins",
-        "level": "Level : 10",
-        },
-        {
-          "name": "carrot",
-          "image": require("../assets/ruby.png"),
-          "price": "30 coins",
-          "level": "Level : 10",
-          },
-          {
-            "name": "carrot",
-            "image": require("../assets/ruby.png"),
-            "price": "30 coins",
-            "level": "Level : 10",
-            },
-            {
-              "name": "carrot",
-              "image": require("../assets/ruby.png"),
-              "price": "30 coins",
-              "level": "Level : 10",
-              },
-    ];
-    var i = 0;
-  var items = []
-  querySnapshot.forEach(doc => {
-    items.push(
-    {"name":doc["name"],
-    "image":doc["image"],
-    "price":doc["price"],
-  "level" : doc["level"]})
-  })
-    return (
-      <View style = {{flexDirection : "row", flexWrap:"wrap", flex : 1}}>
-        <ImageBackground source = {require("../assets/backgroud.png")}>
-          <Topbar/>
-      <ScrollView style={{ flex: 1 }}
-        horizontal={true}
-        nestedScrollEnabled={true}
-        contentContainerStyle={{
-          flex: 1,
-          flexWrap: "wrap",
-        }}>
-       {items.map((a) => {
-          return(
-            <Pressable style={styles.itemDiv} onpress={()=>
-            {/*add funtionality for reducing points (get access to db for user and then reduce points,
-              if points are not enough, alert user using alert() function)*/
-            }}> 
-          <View key = {Math.random()}>
-            <Image key = {0} source = {a["image"]}></Image>
-          <Text key = {1} style={styles.txt1}>{a["name"]}</Text>
-          <Text key = {2} style={styles.txt2}>{a["price"]}</Text> 
-          <Text key = {3} style={styles.txt3}>{a["level"]}</Text>
-          </View>
-          </Pressable>
-          );
-          
-        }
-          )
-          }
-          </ScrollView>
-      <BottomBar/>
-      </ImageBackground>
-        
-      </View>
+  const { user, setUser } = useContext(UserContext);
+  const [itemsJSX, setItemsJSX] = useState(
+    <Text style={{ color: "white" }}>Hi!</Text>
   );
-}
+  const db = getFirestore();
+  const items = [];
+  const q = query(
+    collection(db, "shop"),
+    where("levelRequirement", "<=", user["level"])
+  );
+
+  useEffect(() => {
+    getDocs(q)
+      .then((querySnapshot) =>
+        querySnapshot.forEach((doc) => {
+          items.push(doc.data());
+          // console.log("item added");
+        })
+      )
+      .then(() => {
+        // console.log(items);
+        setItemsJSX(
+          <View style={styles.itemsContainer}>
+            {items.map((itemFromArr, index) => (
+              <ImageBackground
+                style={styles.itemBackground}
+                source={require("../assets/shopPanel.png")}
+                key={index}
+              >
+                <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
+              </ImageBackground>
+            ))}
+          </View>
+        );
+      });
+  });
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1 }}>
+      <ImageBackground
+        source={require("../assets/background.png")}
+        style={styles.bg}
+      >
+        <Topbar />
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>Themes</Text>
+        </View>
+        <View></View>
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>Weapons/Abilities</Text>
+        </View>
+        {itemsJSX}
+
+        <BottomBar />
+      </ImageBackground>
+    </View>
+  );
+};
 export default Shop;
 const styles = StyleSheet.create({
-  itemDiv : {
-
-    backgroundColor : '#30D5C8',
-    width : 450,
-    height : 350,
-    alignItems : "center",
-    justifyContent : 'space-around',
-    margin : 30,
-
-    
-    fontFamily : 'e'
-    
+  bg: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
   },
-  it : {
-    flexShrink : 1,
-    width : "200",
-    height : "300"
-
+  banner: {
+    marginTop: 50,
+    backgroundColor: "#DD4141",
+    width: "100%",
   },
-  txt1 : {
-    fontFamily : 'e',
-    fontSize  : 30
+  bannerText: {
+    fontSize: 30,
+    fontFamily: "RetroGaming",
+    color: "white",
+    textAlign: "center",
   },
-  txt2 : {
-    fontFamily : 'e',
-    fontSize  : 20
+  itemBackground: {
+    width: 90,
+    height: 110,
+    resizeMode: "contain",
+    marginRight: 10,
+    marginBottom: 10,
   },
-  txt3 : {
-    fontFamily : 'e',
-    fontSize  : 13
-  }
+  itemsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  itemText: {
+    fontSize: 15,
+    fontFamily: "RetroGaming",
+    color: "white",
+    textAlign: "center",
+  },
+  itemImage: {
+    height: "60%",
+    width: "auto",
+    resizeMode: "contain",
+  },
 });
