@@ -67,6 +67,7 @@ const Shop = ()=>{
   })
     return (
       <View style = {{ flexWrap:"wrap", flex : 1,backgroundColor : "black"}}>
+      <ImageBackground source = {require("../assets/background.png")}>
       <Topbar/>
         <ScrollView 
         
@@ -137,7 +138,7 @@ const Shop = ()=>{
          </View>
          </ScrollView>
       <BottomBar/>
-      
+      </ImageBackground>
         
       </View>
   );
