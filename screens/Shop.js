@@ -20,6 +20,8 @@ import {
 } from "firebase/firestore";
 import { useContext, useEffect } from "react/cjs/react.development";
 import { UserContext } from "../UserContext.js";
+import { db } from "../firebase";
+import { doc, updateDoc } from "@firebase/firestore";
 
 const Shop = () => {
   const [loaded] = useFonts({
@@ -28,7 +30,6 @@ const Shop = () => {
   const { user, setUser } = useContext(UserContext);
   const [itemsJSX, setItemsJSX] = useState();
   const [emotesJSX, setEmotesJSX] = useState();
-  const db = getFirestore();
   const items = [];
   const q = query(
     collection(db, "shop"),
@@ -123,20 +124,50 @@ const Shop = () => {
                     source={require("../assets/shopPanel.png")}
                     key={index}
                   >
-                    <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
-                    <Image style={styles.itemImage} source={image}></Image>
-                    <Image
-                      style={styles.coinIcon}
-                      source={require("../assets/coin.png")}
-                    />
-                    <Text style={styles.itemFooter}>
-                      {itemFromArr["priceCoins"]}
-                    </Text>
-                    <Text style={styles.itemFooter}>
-                      {itemFromArr["multiplierXP"]}x XP,{" "}
-                      {itemFromArr["multiplierCoins"]}x coins
-                    </Text>
-                    {multiplayerBoost}
+                    <Pressable
+                      onPress={() => {
+                        if (user["coins"] > itemFromArr["priceCoins"]) {
+                          setUser({
+                            coins: user["coins"] - itemFromArr["priceCoins"],
+                            currentXp: user["currentXp"],
+                            diamonds: user["diamonds"],
+                            displayName: user["displayName"],
+                            email: user["email"],
+                            level: user["level"],
+                            multiplier: user["multiplier"],
+                            questsDone: user["questsDone"],
+                            tasks: user["tasks"],
+                            items: user["items"].push(itemFromArr),
+                            emotes: user["emotes"],
+                          });
+                          console.log(user);
+
+                          updateDoc(doc(db, "users", user["email"]), {
+                            coins: user["coins"] - itemFromArr["priceCoins"],
+                            items: user["items"].push(itemFromArr),
+                          });
+
+                          alert("Item purchased!");
+                        } else {
+                          alert("Insufficient funds!");
+                        }
+                      }}
+                    >
+                      <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
+                      <Image style={styles.itemImage} source={image}></Image>
+                      <Image
+                        style={styles.coinIcon}
+                        source={require("../assets/coin.png")}
+                      />
+                      <Text style={styles.itemFooter}>
+                        {itemFromArr["priceCoins"]}
+                      </Text>
+                      <Text style={styles.itemFooter}>
+                        {itemFromArr["multiplierXP"]}x XP,{" "}
+                        {itemFromArr["multiplierCoins"]}x coins
+                      </Text>
+                      {multiplayerBoost}
+                    </Pressable>
                   </ImageBackground>
                 );
               }
@@ -194,15 +225,48 @@ const Shop = () => {
                     source={require("../assets/shopPanel.png")}
                     key={index}
                   >
-                    <Text style={styles.itemText}>{emoteFromArr["name"]}</Text>
-                    <Image style={styles.itemImage} source={image}></Image>
-                    <Text style={styles.itemFooter}>
-                      {emoteFromArr["priceDiamonds"]}
-                    </Text>
-                    <Image
-                      style={styles.rubyIcon}
-                      source={require("../assets/ruby.png")}
-                    />
+                    <Pressable
+                      onPress={() => {
+                        if (user["diamonds"] > emoteFromArr["priceDiamonds"]) {
+                          setUser({
+                            coins: user["coins"],
+                            currentXp: user["currentXp"],
+                            diamonds:
+                              user["diamonds"] - emoteFromArr["priceDiamonds"],
+                            displayName: user["displayName"],
+                            email: user["email"],
+                            level: user["level"],
+                            multiplier: user["multiplier"],
+                            questsDone: user["questsDone"],
+                            tasks: user["tasks"],
+                            emotes: user["emotes"].push(emoteFromArr),
+                            items: user["items"],
+                          });
+                          console.log(user);
+
+                          updateDoc(doc(db, "users", user["email"]), {
+                            diamonds:
+                              user["diamonds"] - emoteFromArr["priceDiamonds"],
+                            emotes: user["emotes"].push(emoteFromArr),
+                          });
+                          alert("Emote purchased!");
+                        } else {
+                          alert("Insufficient funds!");
+                        }
+                      }}
+                    >
+                      <Text style={styles.itemText}>
+                        {emoteFromArr["name"]}
+                      </Text>
+                      <Image style={styles.itemImage} source={image}></Image>
+                      <Text style={styles.itemFooter}>
+                        {emoteFromArr["priceDiamonds"]}
+                      </Text>
+                      <Image
+                        style={styles.rubyIcon}
+                        source={require("../assets/ruby.png")}
+                      />
+                    </Pressable>
                   </ImageBackground>
                 );
               }

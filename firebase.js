@@ -30,4 +30,4 @@ const db = getFirestore(app);
 
 const realtimedb = getDatabase(app);
 
-export { auth, db, realtimedb };
+export { auth, db };
