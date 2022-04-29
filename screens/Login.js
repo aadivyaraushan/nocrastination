@@ -1,8 +1,6 @@
-import { StatusBar } from "expo-status-bar";
 import {
   TextInput,
   StyleSheet,
-  Text,
   View,
   Image,
   ImageBackground,
@@ -10,9 +8,9 @@ import {
 } from "react-native";
 import { useContext, useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getDoc, doc, getFirestore } from "firebase/firestore";
-import BottomBar from "../components/BottomBar.js";
+import { getDoc, doc } from "firebase/firestore";
 import { UserContext } from "../UserContext.js";
+import { auth, db } from "../firebase";
 
 let userCred = null;
 
@@ -21,8 +19,6 @@ function Login({ navigation }) {
   const [password, onChangePassword] = useState("");
   const { user, setUser } = useContext(UserContext);
 
-  const auth = getAuth();
-  const db = getFirestore();
   const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
@@ -35,7 +31,8 @@ function Login({ navigation }) {
     if (docSnap.exists()) {
       setUser(docSnap.data());
       navigation.navigate("homepage");
-      console.log(user);
+      console.log("User logged in: ", user);
+      console.log("Document snapshot data: ", docSnap.data());
     } else console.log("No such document!");
   };
 

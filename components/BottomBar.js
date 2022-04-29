@@ -14,7 +14,7 @@ function BottomBar() {
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("quests")}>
+      <Pressable onPress={() => navigation.navigate("battleselect")}>
         <Image
           source={require("../assets/questsIcon.png")}
           style={styles.icon}

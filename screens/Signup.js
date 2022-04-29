@@ -40,6 +40,7 @@ function Signup({ navigation }) {
         multiplier: 1,
         questsToDo: 0,
         questsDone: 0,
+        tasks: [],
       };
 
       await setDoc(docRef, data);

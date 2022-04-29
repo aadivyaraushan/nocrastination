@@ -84,7 +84,7 @@ const QuestActive = ({ route, navigation }) => {
       // alert("DONE!");
       clearTimeout(timeout);
     };
-  });
+  }, []);
 
   return (
     <View>

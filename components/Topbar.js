@@ -14,10 +14,13 @@ function Topbar() {
 
   const db = getFirestore();
 
-  // Level XP calculations
-  const xpToNextLevel = user["level"] * 100 * user["multiplier"];
-  const level =
-    user["currentXp"] === 0 ? 1 : Math.floor(xpToNextLevel / user["currentXp"]);
+  // // Level XP calculations
+  const xpToNextLevel = Math.floor(user["level"] * 100 * user["multiplier"]);
+  // const level =
+  //   user["currentXp"] === 0 ? 1 : Math.floor(xpToNextLevel / user["currentXp"]);
+  const level = Math.floor(
+    (1 + Math.sqrt(1 + (8 * user["currentXp"]) / 50)) / 2
+  );
   updateDoc(doc(db, "users", user["email"]), {
     level: level,
   });

@@ -29,7 +29,7 @@ function Quest({ navigation }) {
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
 
-  const percentComplete = user["questsDone"] * 25 + "%";
+  const percentComplete = user["questsDone"] * 50 + "%";
   const db = getFirestore();
 
   const q = query(collection(db, "tasks"), where("owner", "==", user["email"]));
@@ -39,6 +39,7 @@ function Quest({ navigation }) {
   const [arrOfQuestsJSX, setArrOfQuestsJSX] = useState();
 
   useEffect(() => {
+    console.log("Use effect just ran!");
     getDocs(q)
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
@@ -57,7 +58,6 @@ function Quest({ navigation }) {
                   alignItems: "center",
                   alignSelf: index % 2 === 0 ? "flex-start" : "flex-end",
                   maxHeight: "25%",
-                  top: -200,
                 }}
                 key={index}
               >
@@ -83,13 +83,7 @@ function Quest({ navigation }) {
         );
       })
       .catch((reason) => alert(reason));
-  });
-
-  // const arrOfQuestsJSX = quests.map((quest, i) => (
-  //   <Text style={styles.questText} key={i}>
-  //     {quest}
-  //   </Text>
-  // ));
+  }, []);
 
   return (
     <View>
@@ -103,7 +97,17 @@ function Quest({ navigation }) {
         />
         {arrOfQuestsJSX}
 
-        <View style={styles.bar}>
+        <View
+          style={{
+            width: 50,
+            flexDirection: "column",
+            height: "100%",
+            backgroundColor: "white",
+            alignSelf: "center",
+            justifyContent: "center",
+            position: "absolute",
+          }}
+        >
           <View
             style={{
               width: 50,
@@ -175,6 +179,7 @@ const styles = StyleSheet.create({
   questText: {
     fontSize: 15,
     textAlign: "center",
+    alignSelf: "center",
     width: "100%",
     color: "white",
     fontFamily: "RetroGaming",

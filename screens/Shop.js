@@ -26,13 +26,17 @@ const Shop = () => {
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
   const { user, setUser } = useContext(UserContext);
-  const [itemsJSX, setItemsJSX] = useState(
-    <Text style={{ color: "white" }}>Hi!</Text>
-  );
+  const [itemsJSX, setItemsJSX] = useState();
+  const [emotesJSX, setEmotesJSX] = useState();
   const db = getFirestore();
   const items = [];
   const q = query(
     collection(db, "shop"),
+    where("levelRequirement", "<=", user["level"])
+  );
+  const emotes = [];
+  const q2 = query(
+    collection(db, "emotes"),
     where("levelRequirement", "<=", user["level"])
   );
 
@@ -46,21 +50,167 @@ const Shop = () => {
       )
       .then(() => {
         // console.log(items);
+        const level = user["level"];
         setItemsJSX(
-          <View style={styles.itemsContainer}>
-            {items.map((itemFromArr, index) => (
-              <ImageBackground
-                style={styles.itemBackground}
-                source={require("../assets/shopPanel.png")}
-                key={index}
-              >
-                <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
-              </ImageBackground>
-            ))}
-          </View>
+          <ScrollView
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              bottom: 90,
+            }}
+            horizontal={true}
+          >
+            {items.map((itemFromArr, index) => {
+              const requirement = itemFromArr["levelRequirement"];
+              if (requirement > level) {
+                return (
+                  <ImageBackground
+                    style={styles.itemBackground}
+                    source={require("../assets/lockedBG.png")}
+                    key={index}
+                  >
+                    <Text style={styles.itemText}>
+                      Unlocked at level {requirement}!
+                    </Text>
+                  </ImageBackground>
+                );
+              } else {
+                let image;
+                switch (itemFromArr["name"]) {
+                  case "Laser Eyes":
+                    image = require("../assets/laserEyes.png");
+                    break;
+                  case "pyrokinesis":
+                    image = require("../assets/pyrokinesis.png");
+                    break;
+                  case "regeneration":
+                    image = require("../assets/regeneration.png");
+                    break;
+                  case "shield":
+                    image = require("../assets/shield.png");
+                    break;
+                  case "sword":
+                    image = require("../assets/sword.png");
+                    break;
+                  case "telekinesis":
+                    image = require("../assets/shopIcon.png");
+                    break;
+                }
+
+                let multiplayerBoost;
+                if (itemFromArr["type"] === "offensive") {
+                  multiplayerBoost = (
+                    <Text style={styles.itemFooter}>
+                      +{itemFromArr["damageBoost"]} damage
+                    </Text>
+                  );
+                } else if (itemFromArr["healthBoost"] != "regeneration") {
+                  multiplayerBoost = (
+                    <Text style={styles.itemFooter}>
+                      +{itemFromArr["healthBoost"]} health
+                    </Text>
+                  );
+                } else {
+                  multiplayerBoost = (
+                    <Text style={styles.itemFooter}>Increasing health</Text>
+                  );
+                }
+
+                return (
+                  <ImageBackground
+                    style={styles.itemBackground}
+                    source={require("../assets/shopPanel.png")}
+                    key={index}
+                  >
+                    <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
+                    <Image style={styles.itemImage} source={image}></Image>
+                    <Image
+                      style={styles.coinIcon}
+                      source={require("../assets/coin.png")}
+                    />
+                    <Text style={styles.itemFooter}>
+                      {itemFromArr["priceCoins"]}
+                    </Text>
+                    <Text style={styles.itemFooter}>
+                      {itemFromArr["multiplierXP"]}x XP,{" "}
+                      {itemFromArr["multiplierCoins"]}x coins
+                    </Text>
+                    {multiplayerBoost}
+                  </ImageBackground>
+                );
+              }
+            })}
+          </ScrollView>
         );
       });
-  });
+
+    getDocs(q2)
+      .then((querySnapshot) =>
+        querySnapshot.forEach((doc) => {
+          emotes.push(doc.data());
+          // console.log("item added");
+        })
+      )
+      .then(() => {
+        // console.log(items);
+        const level = user["level"];
+        setEmotesJSX(
+          <ScrollView style={styles.itemsContainer} horizontal={true}>
+            {emotes.map((emoteFromArr, index) => {
+              const requirement = emoteFromArr["levelRequirement"];
+              if (requirement > level) {
+                return (
+                  <ImageBackground
+                    style={styles.itemBackground}
+                    source={require("../assets/lockedBG.png")}
+                    key={index}
+                  >
+                    <Text style={styles.itemText}>
+                      Unlocked at level {requirement}!
+                    </Text>
+                  </ImageBackground>
+                );
+              } else {
+                let image;
+                switch (emoteFromArr["name"]) {
+                  case "smile":
+                    image = require("../assets/smile.png");
+                    break;
+                  case "embarrased":
+                    image = require("../assets/embarrased.png");
+                    break;
+                  case "ROFL":
+                    image = require("../assets/rofl.png");
+                    break;
+                  case "surprise":
+                    image = require("../assets/surprise.png");
+                    break;
+                }
+
+                return (
+                  <ImageBackground
+                    style={styles.itemBackground}
+                    source={require("../assets/shopPanel.png")}
+                    key={index}
+                  >
+                    <Text style={styles.itemText}>{emoteFromArr["name"]}</Text>
+                    <Image style={styles.itemImage} source={image}></Image>
+                    <Text style={styles.itemFooter}>
+                      {emoteFromArr["priceDiamonds"]}
+                    </Text>
+                    <Image
+                      style={styles.rubyIcon}
+                      source={require("../assets/ruby.png")}
+                    />
+                  </ImageBackground>
+                );
+              }
+            })}
+          </ScrollView>
+        );
+      });
+  }, [...items]);
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1 }}>
       <ImageBackground
@@ -69,10 +219,10 @@ const Shop = () => {
       >
         <Topbar />
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>Themes</Text>
+          <Text style={styles.bannerText}>Emotes</Text>
         </View>
-        <View></View>
-        <View style={styles.banner}>
+        {emotesJSX}
+        <View style={styles.itemsBanner}>
           <Text style={styles.bannerText}>Weapons/Abilities</Text>
         </View>
         {itemsJSX}
@@ -95,14 +245,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bannerText: {
-    fontSize: 30,
+    fontSize: 40,
     fontFamily: "RetroGaming",
     color: "white",
     textAlign: "center",
   },
   itemBackground: {
-    width: 90,
-    height: 110,
+    width: 150,
+    height: 220,
     resizeMode: "contain",
     marginRight: 10,
     marginBottom: 10,
@@ -119,8 +269,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   itemImage: {
-    height: "60%",
+    height: "40%",
     width: "auto",
     resizeMode: "contain",
+  },
+  itemFooter: {
+    fontSize: 15,
+    fontFamily: "RetroGaming",
+    color: "white",
+    textAlign: "center",
+  },
+  coinIcon: {
+    resizeMode: "contain",
+    width: "auto",
+    height: 15,
+    position: "relative",
+    right: 20,
+    top: 16,
+  },
+  rubyIcon: {
+    resizeMode: "contain",
+    width: "auto",
+    height: 15,
+    position: "relative",
+    right: 25,
+    bottom: 16,
+  },
+  itemsBanner: {
+    backgroundColor: "#DD4141",
+    width: "100%",
+    bottom: 90,
   },
 });
