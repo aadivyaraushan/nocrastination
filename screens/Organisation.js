@@ -13,7 +13,6 @@ import BottomBar from "../components/BottomBar";
 
 const Organisation = () => {
   const { organisation, setOrganisation } = useContext(OrganisationContext);
-  //   console.log(organisation);
 
   return (
     <View>

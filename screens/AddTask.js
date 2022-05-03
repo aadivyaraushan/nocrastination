@@ -17,7 +17,6 @@ const AddTask = () => {
   const [difficulty, setDifficulty] = useState();
 
   const { user, setUser } = useContext(UserContext);
-  console.log(user);
   const db = getFirestore();
 
   const handleAdd = async () => {
@@ -52,11 +51,11 @@ const AddTask = () => {
       multiplier: user["multiplier"],
       questsDone: user["questsDone"],
       tasks: user["tasks"],
+      avatar: user["avatar"],
     });
 
     const userRef = doc(db, "users", user["email"]);
     await updateDoc(userRef, {
-      questsToDo: user["questsToDo"],
       tasks: user["tasks"],
     });
   };

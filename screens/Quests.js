@@ -39,7 +39,6 @@ function Quest({ navigation }) {
   const [arrOfQuestsJSX, setArrOfQuestsJSX] = useState();
 
   useEffect(() => {
-    console.log("Use effect just ran!");
     getDocs(q)
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {

@@ -13,7 +13,6 @@ import BottomBar from "../components/BottomBar";
 
 function Homepage({ navigation }) {
   const { user, setUser } = useContext(UserContext);
-  // console.log(message);
 
   const handleQuest = () => {
     navigation.navigate("Quest");

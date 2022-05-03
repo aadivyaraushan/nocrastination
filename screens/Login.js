@@ -31,8 +31,6 @@ function Login({ navigation }) {
     if (docSnap.exists()) {
       setUser(docSnap.data());
       navigation.navigate("homepage");
-      console.log("User logged in: ", user);
-      console.log("Document snapshot data: ", docSnap.data());
     } else console.log("No such document!");
   };
 

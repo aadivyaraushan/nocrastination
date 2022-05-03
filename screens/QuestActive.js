@@ -32,12 +32,9 @@ const QuestActive = ({ route, navigation }) => {
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
 
-  // console.log(imageName);
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       setTime(time - 1);
-      // console.log(time);
     }, 1000);
 
     if (time === 0) {
@@ -46,11 +43,6 @@ const QuestActive = ({ route, navigation }) => {
           text: "Yes",
           onPress: () => {
             Alert.alert("Quest completed! You will now recieve the rewards.");
-            console.log(
-              "Coins gained: ",
-              rewardData[quest["difficulty"]]["coins"]
-            );
-            console.log("XP gained: ", rewardData[quest["difficulty"]]["xp"]);
             setUser({
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
@@ -62,8 +54,8 @@ const QuestActive = ({ route, navigation }) => {
               multiplier: user["multiplier"],
               questsToDo: user["questsToDo"],
               questsDone: user["questsDone"] + 1,
+              avatar: user["avatar"],
             });
-            console.log("Updated user: \n" + user);
             updateDoc(doc(db, "users", user["email"]), {
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
@@ -94,7 +86,6 @@ const QuestActive = ({ route, navigation }) => {
         onLayout={async () => {
           await NavigationBar.setVisibilityAsync("hidden");
           await setStatusBarHidden(true);
-          // console.log("Hiding navigation bar");
         }}
       >
         <Text style={styles.disclaimerText}>PUT THE PHONE DOWN!</Text>

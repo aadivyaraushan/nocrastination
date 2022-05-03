@@ -16,7 +16,6 @@ import { NavigationContainer } from "@react-navigation/native";
 
 const QuestPage = ({ route, navigation }) => {
   const rewardData = route.params;
-  console.log(rewardData);
   const { quest, setQuest } = useContext(QuestContext);
 
   const [duration, setDuration] = useState(0);

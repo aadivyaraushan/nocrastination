@@ -36,7 +36,6 @@ const Organisations = ({ navigation }) => {
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           organisations.push(doc.data());
-          // console.log(doc.data());
         });
       })
       .then(() => {

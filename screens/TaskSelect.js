@@ -14,10 +14,12 @@ import { UserContext } from "../UserContext";
 import { QuestContext } from "../QuestContext";
 import {
   collection,
+  doc,
   getDoc,
   getDocs,
   getFirestore,
   query,
+  updateDoc,
   where,
 } from "@firebase/firestore";
 import { db } from "../firebase";
@@ -34,11 +36,32 @@ const PickATask = ({ navigation }) => {
         });
       })
       .then(() => {
-        navigation.navigate("multiplayerBattle");
+        setUser({
+          activeQuest: quest,
+          avatar: user["avatar"],
+          coins: user["coins"],
+          currentXp: user["currentXp"],
+          diamonds: user["diamonds"],
+          displayName: user["displayName"],
+          email: user["email"],
+          emotes: user["emotes"],
+          items: user["items"],
+          level: user["level"],
+          multiplier: user["multiplier"],
+          questsDone: user["questsDone"],
+          tasks: user["tasks"],
+        });
+      })
+      .then(() => {
+        updateDoc(doc(db, "users", user["email"]), {
+          activeQuest: quest,
+        });
+      })
+      .then(() => {
+        navigation.navigate("matchmakingSelect");
       });
   };
 
-  console.log(user);
   return (
     <View>
       <ImageBackground

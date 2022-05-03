@@ -35,7 +35,7 @@ const BattleSelect = ({ navigation }) => {
         <Pressable
           style={styles.buttonContainer2}
           onPress={() => {
-            navigation.navigate("pickatask");
+            navigation.navigate("taskSelect");
           }}
         >
           <Image

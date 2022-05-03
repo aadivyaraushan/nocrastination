@@ -46,11 +46,9 @@ const Shop = () => {
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
           items.push(doc.data());
-          // console.log("item added");
         })
       )
       .then(() => {
-        // console.log(items);
         const level = user["level"];
         setItemsJSX(
           <ScrollView
@@ -126,9 +124,14 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        if (user["coins"] > itemFromArr["priceCoins"]) {
+                        if (user["items"].includes(itemFromArr)) {
+                          alert("You already have this item!");
+                        } else if (user["coins"] >= itemFromArr["priceCoins"]) {
+                          user["items"].push(itemFromArr);
+                          user["coins"] =
+                            user["coins"] - itemFromArr["priceCoins"];
                           setUser({
-                            coins: user["coins"] - itemFromArr["priceCoins"],
+                            coins: user["coins"],
                             currentXp: user["currentXp"],
                             diamonds: user["diamonds"],
                             displayName: user["displayName"],
@@ -137,14 +140,14 @@ const Shop = () => {
                             multiplier: user["multiplier"],
                             questsDone: user["questsDone"],
                             tasks: user["tasks"],
-                            items: user["items"].push(itemFromArr),
+                            items: user["items"],
                             emotes: user["emotes"],
+                            avatar: user["avatar"],
                           });
-                          console.log(user);
 
                           updateDoc(doc(db, "users", user["email"]), {
                             coins: user["coins"] - itemFromArr["priceCoins"],
-                            items: user["items"].push(itemFromArr),
+                            items: user["items"],
                           });
 
                           alert("Item purchased!");
@@ -180,11 +183,9 @@ const Shop = () => {
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
           emotes.push(doc.data());
-          // console.log("item added");
         })
       )
       .then(() => {
-        // console.log(items);
         const level = user["level"];
         setEmotesJSX(
           <ScrollView style={styles.itemsContainer} horizontal={true}>
@@ -227,7 +228,8 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        if (user["diamonds"] > emoteFromArr["priceDiamonds"]) {
+                        if (user["diamonds"] >= emoteFromArr["priceDiamonds"]) {
+                          user["emotes"].push(emoteFromArr);
                           setUser({
                             coins: user["coins"],
                             currentXp: user["currentXp"],
@@ -239,15 +241,15 @@ const Shop = () => {
                             multiplier: user["multiplier"],
                             questsDone: user["questsDone"],
                             tasks: user["tasks"],
-                            emotes: user["emotes"].push(emoteFromArr),
+                            emotes: user["emotes"],
                             items: user["items"],
+                            avatar: user["avatar"],
                           });
-                          console.log(user);
 
                           updateDoc(doc(db, "users", user["email"]), {
                             diamonds:
                               user["diamonds"] - emoteFromArr["priceDiamonds"],
-                            emotes: user["emotes"].push(emoteFromArr),
+                            emotes: user["emotes"],
                           });
                           alert("Emote purchased!");
                         } else {
