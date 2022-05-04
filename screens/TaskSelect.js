@@ -9,7 +9,7 @@ import {
 import React from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import { useContext, useEffect } from "react/cjs/react.development";
+import { useContext, useEffect, useState } from "react/cjs/react.development";
 import { UserContext } from "../UserContext";
 import { QuestContext } from "../QuestContext";
 import {
@@ -23,43 +23,55 @@ import {
   where,
 } from "@firebase/firestore";
 import { db } from "../firebase";
+import { Audio } from "expo-av";
 
 const PickATask = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { quest, setQuest } = useContext(QuestContext);
+  const [sound, setSound] = useState();
+
+  async function playSelect() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   const pressHandler = (taskTitle) => {
     getDocs(query(collection(db, "tasks"), where("title", "==", taskTitle)))
       .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          setQuest(doc.data());
+        querySnapshot.forEach((task) => {
+          console.log("Changing quest's value to be: \n", task.data());
+          questTemp = task.data();
+          setQuest(questTemp);
+          setUser({
+            activeQuest: questTemp,
+            avatar: user["avatar"],
+            coins: user["coins"],
+            currentXp: user["currentXp"],
+            diamonds: user["diamonds"],
+            displayName: user["displayName"],
+            email: user["email"],
+            emotes: user["emotes"],
+            items: user["items"],
+            level: user["level"],
+            multiplier: user["multiplier"],
+            questsDone: user["questsDone"],
+            tasks: user["tasks"],
+          });
+          console.log("Active quest: \n", user["activeQuest"]);
+          updateDoc(doc(db, "users", user["email"]), {
+            activeQuest: questTemp,
+          })
+            .then(() => {
+              playSelect();
+              navigation.navigate("matchmakingSelect");
+            })
+            .catch((err) => console.log(err));
         });
       })
-      .then(() => {
-        setUser({
-          activeQuest: quest,
-          avatar: user["avatar"],
-          coins: user["coins"],
-          currentXp: user["currentXp"],
-          diamonds: user["diamonds"],
-          displayName: user["displayName"],
-          email: user["email"],
-          emotes: user["emotes"],
-          items: user["items"],
-          level: user["level"],
-          multiplier: user["multiplier"],
-          questsDone: user["questsDone"],
-          tasks: user["tasks"],
-        });
-      })
-      .then(() => {
-        updateDoc(doc(db, "users", user["email"]), {
-          activeQuest: quest,
-        });
-      })
-      .then(() => {
-        navigation.navigate("matchmakingSelect");
-      });
+      .then(() => {});
   };
 
   return (
@@ -79,6 +91,7 @@ const PickATask = ({ navigation }) => {
                 style={styles.taskContainer}
                 key={index}
                 onPress={() => pressHandler(task)}
+                android_disableSound={true}
               >
                 <Text style={styles.tasksText}>{task}</Text>
               </Pressable>

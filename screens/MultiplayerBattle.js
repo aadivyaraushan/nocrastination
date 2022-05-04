@@ -16,6 +16,8 @@ import { setButtonStyleAsync } from "expo-navigation-bar";
 import { UserContext } from "../UserContext";
 import { deleteDoc, doc, updateDoc } from "@firebase/firestore";
 import { db } from "../firebase";
+import { Audio } from "expo-av";
+import { Sound } from "expo-av/build/Audio";
 
 const MultiplayerBattle = ({ route, navigation }) => {
   const rewardData = route.params;
@@ -34,6 +36,40 @@ const MultiplayerBattle = ({ route, navigation }) => {
   const [subTasksP2, setSubTasksP2] = useState(
     game["player2"]["activeQuest"]["subTasks"]
   );
+  const [sound, setSound] = useState();
+
+  // Sound functions
+  async function playDamaged() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/damaged.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+
+  async function playVictory() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/victory.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+
+  async function playDefeat() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/defeat.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+
+  async function playAttack() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/attack.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   // Calculating health boost and damage boost
   let player1HealthBoost = 0;
@@ -96,6 +132,11 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
   useEffect(() => {
     if (player1Health <= 0) {
+      if (game["player2"]["email"] == user["email"]) {
+        playVictory();
+      } else {
+        playDefeat();
+      }
       alert(game["player2"]["displayName"] + " wins!");
       updateDoc(doc(db, "users", game["player2"]["email"]), {
         coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
@@ -104,6 +145,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
         .then(() => {
           if (game["player2"]["email"] === user["email"]) {
             setUser({
+              avatar: user["avatar"],
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
                 user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
@@ -129,6 +171,11 @@ const MultiplayerBattle = ({ route, navigation }) => {
       return;
     }
     if (player2Health <= 0) {
+      if (game["player1"]["email"] == user["email"]) {
+        playVictory();
+      } else {
+        playDefeat();
+      }
       alert(game["player1"]["displayName"] + " wins!");
       updateDoc(doc(db, "users", game["player1"]["email"]), {
         coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
@@ -136,6 +183,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
       })
         .then(() => {
           if (game["player1"]["email"] === user["email"]) {
+            user["tasks"].splice(user["tasks"].indexOf(user["activeQuest"]), 1);
             setUser({
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
@@ -195,6 +243,46 @@ const MultiplayerBattle = ({ route, navigation }) => {
                           "Wait 1 min before checking off another sub-quest"
                         );
                       } else {
+                        if (game["player1"]["email"] === user["email"]) {
+                          playAttack();
+                          user["activeQuest"]["subTasks"].splice(
+                            user["activeQuest"]["subTasks"].indexOf(subTask),
+                            1
+                          );
+                          setUser({
+                            activeQuest: user["activeQuest"],
+                            avatar: user["avatar"],
+                            coins: user["coins"],
+                            diamonds: user["diamonds"],
+                            displayName: user["displayName"],
+                            email: user["email"],
+                            emotes: user["emotes"],
+                            items: user["items"],
+                            level: user["level"],
+                            multiplier: user["multiplier"],
+                            questsDone: user["questsDone"],
+                            tasks: user["tasks"],
+                          });
+
+                          updateDoc(doc(db, "users", user["email"]), {
+                            activeQuest: user["activeQuest"],
+                          });
+                        } else {
+                          playDamaged();
+                          game["player1"]["activeQuest"]["subTasks"].splice(
+                            game["player1"]["activeQuest"]["subTasks"].indexOf(
+                              subTask
+                            ),
+                            1
+                          );
+                          updateDoc(
+                            doc(db, "users", game["player1"]["email"]),
+                            {
+                              activeQuest:
+                                game["player1"]["email"]["activeQuest"],
+                            }
+                          );
+                        }
                         setPlayer2Health(
                           player2Health - player1DamagePerSubTask
                         );
@@ -205,7 +293,8 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     }}
                     key={index}
                     style={styles.textContainer}
-                    disabled={game["player1"]["email"] != user["email"]}
+                    // disabled={game["player1"]["email"] != user["email"]}
+                    android_disableSound={true}
                   >
                     <Text style={styles.text} key={index}>
                       □{subTask}
@@ -227,6 +316,47 @@ const MultiplayerBattle = ({ route, navigation }) => {
                           "Wait 1 min before checking off another sub-quest"
                         );
                       } else {
+                        if (game["player2"]["email"] === user["email"]) {
+                          playAttack();
+                          user["activeQuest"]["subTasks"].splice(
+                            user["activeQuest"]["subTasks"].indexOf(subTask),
+                            1
+                          );
+                          setUser({
+                            activeQuest: user["activeQuest"],
+                            avatar: user["avatar"],
+                            coins: user["coins"],
+                            diamonds: user["diamonds"],
+                            displayName: user["displayName"],
+                            email: user["email"],
+                            emotes: user["emotes"],
+                            items: user["items"],
+                            level: user["level"],
+                            multiplier: user["multiplier"],
+                            questsDone: user["questsDone"],
+                            tasks: user["tasks"],
+                          });
+
+                          updateDoc(doc(db, "users", user["email"]), {
+                            activeQuest: user["activeQuest"],
+                          });
+                        } else {
+                          playDamaged();
+                          game["player2"]["activeQuest"]["subTasks"].splice(
+                            game["player2"]["activeQuest"]["subTasks"].indexOf(
+                              subTask
+                            ),
+                            1
+                          );
+                          updateDoc(
+                            doc(db, "users", game["player2"]["email"]),
+                            {
+                              activeQuest:
+                                game["player2"]["email"]["activeQuest"],
+                            }
+                          );
+                        }
+
                         setPlayer1Health(
                           player1Health - player2DamagePerSubTask
                         );

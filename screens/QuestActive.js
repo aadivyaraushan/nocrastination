@@ -43,6 +43,7 @@ const QuestActive = ({ route, navigation }) => {
           text: "Yes",
           onPress: () => {
             Alert.alert("Quest completed! You will now recieve the rewards.");
+            tasks.splice(tasks.indexOf(quest), 1);
             setUser({
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
@@ -52,14 +53,18 @@ const QuestActive = ({ route, navigation }) => {
               email: user["email"],
               level: user["level"],
               multiplier: user["multiplier"],
-              questsToDo: user["questsToDo"],
               questsDone: user["questsDone"] + 1,
               avatar: user["avatar"],
+              activeQuest: user["activeQuest"],
+              emotes: user["emotes"],
+              items: user["items"],
+              tasks: user["tasks"],
             });
             updateDoc(doc(db, "users", user["email"]), {
               coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
               currentXp:
                 user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
+              tasks: user["tasks"],
             });
           },
         },

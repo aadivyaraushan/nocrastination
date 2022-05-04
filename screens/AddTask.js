@@ -42,7 +42,10 @@ const AddTask = () => {
     await setDoc(doc(db, "tasks", title), data);
     user["tasks"].unshift(data["title"]);
     setUser({
+      activeQuest: user["activeQuest"],
       coins: user["coins"],
+      emotes: user["emotes"],
+      items: user["items"],
       currentXp: user["currentXp"],
       diamonds: user["diamonds"],
       displayName: user["displayName"],

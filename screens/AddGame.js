@@ -15,6 +15,7 @@ import { db } from "../firebase";
 
 const AddGame = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
+  console.log("User imported into AddGame\n", user);
   const id = String(
     Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))
   );
@@ -37,11 +38,11 @@ const AddGame = ({ navigation }) => {
     });
   }, []);
 
-  useEffect(() => {
-    const unsub = navigation.addListener("blur", () => {
-      deleteDoc(doc(db, "games", id));
-    });
-  });
+  // useEffect(() => {
+  //   const unsub = navigation.addListener("blur", () => {
+  //     deleteDoc(doc(db, "games", id));
+  //   });
+  // });
 
   return (
     <View>

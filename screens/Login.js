@@ -6,17 +6,19 @@ import {
   ImageBackground,
   Pressable,
 } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
 import { UserContext } from "../UserContext.js";
 import { auth, db } from "../firebase";
+import { Audio } from "expo-av";
 
 let userCred = null;
 
 function Login({ navigation }) {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
+  const [sound, setSound] = useState();
   const { user, setUser } = useContext(UserContext);
 
   const handleLogin = async () => {
@@ -30,9 +32,28 @@ function Login({ navigation }) {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       setUser(docSnap.data());
+      playSound();
       navigation.navigate("homepage");
     } else console.log("No such document!");
   };
+
+  async function playSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   return (
     <View style={styles.container}>
@@ -58,7 +79,7 @@ function Login({ navigation }) {
             placeholder="Password"
             secureTextEntry
           />
-          <Pressable onPress={handleLogin}>
+          <Pressable onPress={handleLogin} android_disableSound={true}>
             <Image
               source={require("./../assets/buttons/submit.png")}
               style={styles.submit}

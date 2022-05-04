@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -7,9 +6,32 @@ import {
   ImageBackground,
   Pressable,
 } from "react-native";
-import BottomBar from "../components/BottomBar";
+import { Audio } from "expo-av";
+import { useState, useEffect } from "react";
 
 function AuthenticationScreen({ navigation }) {
+  const [sound, setSound] = useState();
+
+  async function playSound() {
+    console.log("Loading Sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap1.mp3")
+    );
+    setSound(sound);
+
+    console.log("Playing Sound");
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -21,19 +43,37 @@ function AuthenticationScreen({ navigation }) {
           style={styles.banner}
         />
         <View style={styles.buttonsContainer}>
-          <Pressable onPress={() => navigation.navigate("login")}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("login");
+              playSound();
+            }}
+            android_disableSound={true}
+          >
             <Image
               source={require("./../assets/buttons/login.png")}
               style={styles.buttons}
             />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate("signup")}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate("signup");
+              playSound();
+            }}
+            android_disableSound={true}
+          >
             <Image
               source={require("./../assets/buttons/signup.png")}
               style={styles.buttons}
             />
           </Pressable>
-          <Pressable onPress={() => alert("Under development!")}>
+          <Pressable
+            onPress={() => {
+              alert("Under development!");
+              playSound();
+            }}
+            android_disableSound={true}
+          >
             <Image
               source={require("./../assets/buttons/classcode.png")}
               style={styles.buttons}

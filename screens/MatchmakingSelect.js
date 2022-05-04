@@ -24,6 +24,7 @@ import { db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
 import { GameContext } from "../GameContext";
+import { Audio } from "expo-av";
 
 const LoadingMatchmaking = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -31,6 +32,22 @@ const LoadingMatchmaking = ({ navigation }) => {
   const { game, setGame } = useContext(GameContext);
   const [gamesJSX, setGamesJSX] = useState();
   const games = [];
+  const [sound, setSound] = useState();
+
+  async function playSelect() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+  async function playAdd() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap1.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   const pressHandler = (gameFromGames) => {
     updateDoc(doc(db, "games", gameFromGames["id"]), {
@@ -47,6 +64,7 @@ const LoadingMatchmaking = ({ navigation }) => {
         });
       })
       .then(() => {
+        playSelect();
         navigation.navigate("multiplayerBattle");
       });
   };
@@ -112,8 +130,10 @@ const LoadingMatchmaking = ({ navigation }) => {
         <Pressable
           style={styles.addGameButton}
           onPress={() => {
+            playAdd();
             navigation.navigate("addGame");
           }}
+          android_disableSound={true}
         >
           <Image
             source={require("../assets/addGame.png")}

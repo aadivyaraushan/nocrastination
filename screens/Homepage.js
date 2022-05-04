@@ -6,17 +6,40 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import Topbar from ".././components/Topbar";
 import { UserContext } from "../UserContext";
 import BottomBar from "../components/BottomBar";
+import { Audio } from "expo-av";
 
 function Homepage({ navigation }) {
   const { user, setUser } = useContext(UserContext);
+  const [sound, setSound] = useState();
 
   const handleQuest = () => {
-    navigation.navigate("Quest");
+    playTap2();
+    navigation.navigate("battleselect");
   };
+
+  async function playTap2() {
+    console.log("Loading Sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+
+    console.log("Playing Sound");
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   return (
     <View style={styles.container}>
@@ -27,7 +50,11 @@ function Homepage({ navigation }) {
         <Topbar />
         <BottomBar />
 
-        <Pressable onPress={handleQuest} style={styles.QuestButton}>
+        <Pressable
+          onPress={handleQuest}
+          style={styles.QuestButton}
+          android_disableSound={true}
+        >
           <Image
             source={require(".././assets/buttons/battleButton.png")}
             style={styles.QuestImage}

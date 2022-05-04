@@ -24,17 +24,6 @@ function Topbar() {
   updateDoc(doc(db, "users", user["email"]), {
     level: level,
   });
-  // setUser({
-  //   coins: user["coins"],
-  //   currentXp: user["currentXp"],
-  //   diamonds: user["diamonds"],
-  //   displayName: user["displayName"],
-  //   email: user["email"],
-  //   level: level,
-  //   multiplier: user["multiplier"],
-  //   questsToDo: user["questsToDo"],
-  //   questsDone: user["questsDone"],
-  // });
   return (
     <View style={styles.header}>
       <View style={styles.levels}>

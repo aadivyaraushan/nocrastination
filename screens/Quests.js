@@ -21,6 +21,7 @@ import {
   getFirestore,
 } from "firebase/firestore";
 import { useFonts } from "expo-font";
+import { Audio } from "expo-av";
 
 function Quest({ navigation }) {
   const { user, setUser } = useContext(UserContext);
@@ -28,15 +29,19 @@ function Quest({ navigation }) {
   const [loaded] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
-
   const percentComplete = user["questsDone"] * 50 + "%";
   const db = getFirestore();
-
   const q = query(collection(db, "tasks"), where("owner", "==", user["email"]));
-
   const quests = [];
-
   const [arrOfQuestsJSX, setArrOfQuestsJSX] = useState();
+  const [sound, setSound] = useState();
+  async function playTap() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap1.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   useEffect(() => {
     getDocs(q)
@@ -64,8 +69,10 @@ function Quest({ navigation }) {
                   onPress={() => {
                     setQuest(questFromArr);
                     // alert("Quest navigating to...\n" + quest["title"]);
+                    playTap();
                     navigation.navigate("questPage");
                   }}
+                  android_disableSound={true}
                 >
                   <Text key={index} style={styles.questText}>
                     {questFromArr["title"]}

@@ -22,8 +22,10 @@ import { useContext, useEffect } from "react/cjs/react.development";
 import { UserContext } from "../UserContext.js";
 import { db } from "../firebase";
 import { doc, updateDoc } from "@firebase/firestore";
+import { Audio } from "expo-av";
 
 const Shop = () => {
+  const [sound, setSound] = useState();
   const [loaded] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
@@ -40,6 +42,23 @@ const Shop = () => {
     collection(db, "emotes"),
     where("levelRequirement", "<=", user["level"])
   );
+
+  async function playPurchaseSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/itemPurchase.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+
+  async function playPurchaseFailed() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/purchaseFailed.mp3")
+    );
+    setSound(sound);
+
+    await sound.playAsync();
+  }
 
   useEffect(() => {
     getDocs(q)
@@ -124,13 +143,20 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        if (user["items"].includes(itemFromArr)) {
+                        console.log("User's current state: ", user);
+                        if (user["items"].indexOf(itemFromArr) != -1) {
+                          playPurchaseFailed();
                           alert("You already have this item!");
-                        } else if (user["coins"] >= itemFromArr["priceCoins"]) {
+                          return;
+                        } else if (
+                          user["coins"] >= itemFromArr["priceCoins"] &&
+                          user["items"].indexOf(itemFromArr) == -1
+                        ) {
                           user["items"].push(itemFromArr);
                           user["coins"] =
                             user["coins"] - itemFromArr["priceCoins"];
                           setUser({
+                            activeQuest: user["activeQuest"],
                             coins: user["coins"],
                             currentXp: user["currentXp"],
                             diamonds: user["diamonds"],
@@ -150,11 +176,14 @@ const Shop = () => {
                             items: user["items"],
                           });
 
+                          playPurchaseSound();
                           alert("Item purchased!");
                         } else {
+                          playPurchaseFailed();
                           alert("Insufficient funds!");
                         }
                       }}
+                      android_disableSound={true}
                     >
                       <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
                       <Image style={styles.itemImage} source={image}></Image>
@@ -231,6 +260,7 @@ const Shop = () => {
                         if (user["diamonds"] >= emoteFromArr["priceDiamonds"]) {
                           user["emotes"].push(emoteFromArr);
                           setUser({
+                            activeQuest: user["activeQuest"],
                             coins: user["coins"],
                             currentXp: user["currentXp"],
                             diamonds:
@@ -251,8 +281,10 @@ const Shop = () => {
                               user["diamonds"] - emoteFromArr["priceDiamonds"],
                             emotes: user["emotes"],
                           });
+                          playPurchaseSound();
                           alert("Emote purchased!");
                         } else {
+                          playPurchaseFailed();
                           alert("Insufficient funds!");
                         }
                       }}

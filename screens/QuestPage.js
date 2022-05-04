@@ -13,17 +13,15 @@ import Topbar from "../components/Topbar";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import BottomBar from "../components/BottomBar";
 import { NavigationContainer } from "@react-navigation/native";
+import { Audio } from "expo-av";
 
 const QuestPage = ({ route, navigation }) => {
   const rewardData = route.params;
   const { quest, setQuest } = useContext(QuestContext);
-
   const [duration, setDuration] = useState(0);
-
   const [loaded] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
-
   let rewardsJSX = (
     <>
       <Text style={styles.paragraphText}>
@@ -34,33 +32,21 @@ const QuestPage = ({ route, navigation }) => {
       </Text>
     </>
   );
-
-  // switch (quest["difficulty"]) {
-  //   case "easy":
-  //     rewardsJSX = (
-  //       <>
-  //         <Text style={styles.paragraphText}>10xp</Text>
-  //         <Text style={styles.paragraphText}>5 coins</Text>
-  //       </>
-  //     );
-  //     break;
-  //   case "medium":
-  //     rewardsJSX = (
-  //       <>
-  //         <Text style={styles.paragraphText}>20xp</Text>
-  //         <Text style={styles.paragraphText}>10 coins</Text>
-  //       </>
-  //     );
-  //     break;
-  //   case "hard":
-  //     rewardsJSX = (
-  //       <>
-  //         <Text style={styles.paragraphText}>40xp</Text>
-  //         <Text style={styles.paragraphText}>20 coins</Text>
-  //       </>
-  //     );
-  //     break;
-  // }
+  const [sound, setSound] = useState();
+  async function playTap() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
+  async function playFailed() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/purchaseFailed.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   return (
     <View>
@@ -107,9 +93,14 @@ const QuestPage = ({ route, navigation }) => {
           style={{ width: "20%", height: "20%", left: 150, bottom: 250 }}
           onPress={() => {
             if (duration != 0) {
+              playTap();
               navigation.navigate("activeQuestPage");
-            } else alert("Duraton cannot be 0!");
+            } else {
+              playFailed();
+              alert("Duraton cannot be 0!");
+            }
           }}
+          android_disableSound={true}
         >
           <Image
             source={require("../assets/playButton.png")}

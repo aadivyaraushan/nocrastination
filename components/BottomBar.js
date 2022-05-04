@@ -2,37 +2,81 @@ import { StyleSheet, View, Text, Image } from "react-native";
 import react from "react";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useState } from "react/cjs/react.development";
+import { Audio } from "expo-av";
 
 function BottomBar() {
   const navigation = useNavigation();
+  const [sound, setSound] = useState();
+
+  async function playTap1() {
+    console.log("Loading Sound");
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap1.mp3")
+    );
+    setSound(sound);
+
+    console.log("Playing Sound");
+    await sound.playAsync();
+  }
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.navigate("shop")}>
+      <Pressable
+        onPress={() => {
+          playTap1();
+          navigation.navigate("shop");
+        }}
+        android_disableSound={true}
+      >
         <Image
           source={require("../assets/shopIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("battleselect")}>
+      <Pressable
+        onPress={() => {
+          playTap1();
+          navigation.navigate("battleselect");
+        }}
+        android_disableSound={true}
+      >
         <Image
           source={require("../assets/questsIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("addtask")}>
+      <Pressable
+        onPress={() => {
+          playTap1();
+          navigation.navigate("addtask");
+        }}
+        android_disableSound={true}
+      >
         <Image
           source={require("../assets/addTaskIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("organisations")}>
+      <Pressable
+        onPress={() => {
+          playTap1();
+          navigation.navigate("organisations");
+        }}
+        android_disableSound={true}
+      >
         <Image
           source={require("../assets/socialIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate("settings")}>
+      <Pressable
+        onPress={() => {
+          playTap1();
+          navigation.navigate("settings");
+        }}
+        android_disableSound={true}
+      >
         <Image
           source={require("../assets/settingsIcon.png")}
           style={styles.icon}

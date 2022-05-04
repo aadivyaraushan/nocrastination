@@ -21,6 +21,7 @@ import {
 import { useContext, useEffect } from "react/cjs/react.development";
 import { auth, db } from "../firebase";
 import { OrganisationContext } from "../OrganisationContext";
+import { Audio } from "expo-av";
 
 const Organisations = ({ navigation }) => {
   const [loaded] = useFonts({
@@ -28,8 +29,15 @@ const Organisations = ({ navigation }) => {
   });
   const [organisationsJSX, setOrganisationsJSX] = useState();
   const { organisation, setOrganisation } = useContext(OrganisationContext);
-
   let organisations = [];
+  const [sound, setSound] = useState();
+  async function playTap() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap1.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
   useEffect(() => {
     getDocs(collection(db, "organisations"))
@@ -45,10 +53,12 @@ const Organisations = ({ navigation }) => {
               return (
                 <Pressable
                   onPress={() => {
+                    playTap();
                     navigation.navigate("organisation");
                     setOrganisation(organisation);
                   }}
                   key={index}
+                  android_disableSound={true}
                 >
                   <ImageBackground
                     source={require("../assets/organisationBG.png")}

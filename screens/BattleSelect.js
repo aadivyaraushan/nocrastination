@@ -9,8 +9,21 @@ import {
 import React from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
+import { useState } from "react/cjs/react.development";
+import { Audio } from "expo-av";
 
 const BattleSelect = ({ navigation }) => {
+  const [sound, setSound] = useState();
+
+  async function playTap() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/sfx/tap2.mp3")
+    );
+    setSound(sound);
+
+    await sound.playAsync();
+  }
+
   return (
     <View>
       <ImageBackground
@@ -24,8 +37,10 @@ const BattleSelect = ({ navigation }) => {
         <Pressable
           style={styles.buttonContainer1}
           onPress={() => {
+            playTap();
             navigation.navigate("quests");
           }}
+          android_disableSound={true}
         >
           <Image
             source={require("../assets/singleplayerButton.png")}
@@ -35,8 +50,10 @@ const BattleSelect = ({ navigation }) => {
         <Pressable
           style={styles.buttonContainer2}
           onPress={() => {
+            playTap();
             navigation.navigate("taskSelect");
           }}
+          android_disableSound={true}
         >
           <Image
             source={require("../assets/multiplayerButton.png")}
