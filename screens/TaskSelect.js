@@ -12,16 +12,7 @@ import BottomBar from "../components/BottomBar";
 import { useContext, useEffect, useState } from "react/cjs/react.development";
 import { UserContext } from "../UserContext";
 import { QuestContext } from "../QuestContext";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  getFirestore,
-  query,
-  updateDoc,
-  where,
-} from "@firebase/firestore";
+import { doc, getDoc, updateDoc } from "@firebase/firestore";
 import { db } from "../firebase";
 import { Audio } from "expo-av";
 
@@ -39,12 +30,16 @@ const PickATask = ({ navigation }) => {
   }
 
   const pressHandler = (taskTitle) => {
-    getDocs(query(collection(db, "tasks"), where("title", "==", taskTitle)))
-      .then((querySnapshot) => {
-        querySnapshot.forEach((task) => {
-          console.log("Changing quest's value to be: \n", task.data());
-          questTemp = task.data();
+    playSelect();
+    getDoc(doc(db, "tasks", taskTitle)).then((task) => {
+      const questTemp = task.data();
+      updateDoc(doc(db, "users", user["email"]), {
+        activeQuest: questTemp,
+      })
+        .then(() => {
           setQuest(questTemp);
+        })
+        .then(() => {
           setUser({
             activeQuest: questTemp,
             avatar: user["avatar"],
@@ -60,18 +55,12 @@ const PickATask = ({ navigation }) => {
             questsDone: user["questsDone"],
             tasks: user["tasks"],
           });
-          console.log("Active quest: \n", user["activeQuest"]);
-          updateDoc(doc(db, "users", user["email"]), {
-            activeQuest: questTemp,
-          })
-            .then(() => {
-              playSelect();
-              navigation.navigate("matchmakingSelect");
-            })
-            .catch((err) => console.log(err));
-        });
-      })
-      .then(() => {});
+        })
+        .then(() => {
+          navigation.navigate("matchmakingSelect");
+        })
+        .catch((err) => console.log(err));
+    });
   };
 
   return (

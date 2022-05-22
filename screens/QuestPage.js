@@ -124,15 +124,20 @@ const styles = StyleSheet.create({
   },
   banner: {
     width: "100%",
-    height: "7%",
+    height: "15%",
     backgroundColor: "#E92720",
     top: 50,
+    flex: 1,
+    flexDirection: "row",
   },
   bannerText: {
     color: "#fff",
     textAlign: "center",
     fontFamily: "RetroGaming",
-    fontSize: 30,
+    fontSize: 25,
+    flex: 1,
+    flexWrap: "wrap",
+    alignSelf: "center",
   },
   paragraphText: {
     fontFamily: "RetroGaming",

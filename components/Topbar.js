@@ -14,16 +14,36 @@ function Topbar() {
 
   const db = getFirestore();
 
-  // // Level XP calculations
-  const xpToNextLevel = Math.floor(user["level"] * 100 * user["multiplier"]);
-  // const level =
-  //   user["currentXp"] === 0 ? 1 : Math.floor(xpToNextLevel / user["currentXp"]);
-  const level = Math.floor(
-    (1 + Math.sqrt(1 + (8 * user["currentXp"]) / 50)) / 2
-  );
+  // Level XP calculations
+  // const xpToNextLevel = Math.floor(user["level"] * 100 * user["multiplier"]);
+  // const level = Math.floor(
+  //   (1 + Math.sqrt(1 + (8 * user["currentXp"]) / 50)) / 2
+  // );
+
+  const currentLevel = Math.floor(0.07 * Math.sqrt(user["currentXp"]));
+  const xpAtNextLevel = Math.floor(((currentLevel + 1) / 0.07) ** 2);
+  const xpToReachCurrentLevel = Math.floor((currentLevel / 0.07) ** 2);
+
   updateDoc(doc(db, "users", user["email"]), {
-    level: level,
+    level: currentLevel,
+  }).then(() => {
+    setUser({
+      activeQuest: user["activeQuest"],
+      avatar: user["avatar"],
+      coins: user["coins"],
+      currentXp: user["currentXp"],
+      diamonds: user["diamonds"],
+      displayName: user["displayName"],
+      email: user["email"],
+      emotes: user["emotes"],
+      items: user["items"],
+      level: currentLevel,
+      multiplier: user["multiplier"],
+      questsDone: user["questsDone"],
+      tasks: user["tasks"],
+    });
   });
+
   return (
     <View style={styles.header}>
       <View style={styles.levels}>
@@ -32,7 +52,8 @@ function Topbar() {
         </View>
         <View style={styles.progress}>
           <Text style={styles.progressText}>
-            {user["currentXp"]}/{xpToNextLevel}
+            {user["currentXp"] - xpToReachCurrentLevel}/
+            {xpAtNextLevel - xpToReachCurrentLevel}
           </Text>
         </View>
       </View>
@@ -64,6 +85,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     backgroundColor: "#1F2025",
     position: "absolute",
+    zIndex: 2,
   },
   level: {
     backgroundColor: "#20A4A4",

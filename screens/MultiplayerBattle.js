@@ -249,6 +249,12 @@ const MultiplayerBattle = ({ route, navigation }) => {
                             user["activeQuest"]["subTasks"].indexOf(subTask),
                             1
                           );
+                          console.log(
+                            "removed ",
+                            subTask,
+                            " from ",
+                            user["activeQuest"]["subTasks"]
+                          );
                           setUser({
                             activeQuest: user["activeQuest"],
                             avatar: user["avatar"],
@@ -293,7 +299,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     }}
                     key={index}
                     style={styles.textContainer}
-                    // disabled={game["player1"]["email"] != user["email"]}
+                    disabled={game["player1"]["email"] != user["email"]}
                     android_disableSound={true}
                   >
                     <Text style={styles.text} key={index}>

@@ -5,44 +5,89 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import { useContext, useEffect } from "react/cjs/react.development";
-import { deleteDoc, doc, setDoc } from "@firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
+  query,
+  collection,
+  where,
+} from "firebase/firestore";
 import { UserContext } from "../UserContext";
 import { db } from "../firebase";
+import { GameContext } from "../GameContext";
+
+const id = Math.floor(Math.random() * Math.floor(Math.random() * Date.now()));
+console.log("ID: ", id);
 
 const AddGame = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
-  console.log("User imported into AddGame\n", user);
-  const id = String(
-    Math.floor(Math.random() * Math.floor(Math.random() * Date.now()))
-  );
+  const { game, setGame } = useContext(GameContext);
 
   const [bodyJSX, setBodyJSX] = useState(
     <View style={styles.container}>
-      <Text style={styles.text}>Waiting for players to join</Text>
+      <Text style={styles.text}>Adding game to queue</Text>
       <ActivityIndicator color="#ffff" size="large" />
     </View>
   );
 
   useEffect(() => {
-    setDoc(doc(db, "games", id), {
-      id: id,
+    setDoc(doc(db, "games", String(id)), {
+      id: String(id),
       created: Date.now(),
       finished: false,
       started: false,
       player1: user,
       player2: null,
-    });
+    })
+      .then(() => {
+        console.log("Game added to database");
+        setGame({
+          id: String(id),
+          created: Date.now(),
+          finished: false,
+          started: false,
+          player1: user,
+          player2: null,
+        });
+      })
+      .then(() => {
+        onSnapshot(doc(db, "games", String(id)), (snapshot) => {
+          setGame(snapshot.data());
+        });
+      })
+      .catch((error) => console.log(error));
   }, []);
 
-  // useEffect(() => {
-  //   const unsub = navigation.addListener("blur", () => {
-  //     deleteDoc(doc(db, "games", id));
-  //   });
-  // });
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+      deleteDoc(doc(db, "games", String(id)));
+    });
+  }, [navigation]);
+
+  useEffect(() => {
+    if (game != null) {
+      setBodyJSX(
+        <View style={styles.container}>
+          <Text style={styles.text}>Waiting for a player to join</Text>
+          <ActivityIndicator color="#ffff" size="large" />
+        </View>
+      );
+      if (game["player2"]) {
+        setBodyJSX(
+          <View style={styles.container}>
+            <Text style={styles.text}>Player found!</Text>
+          </View>
+        );
+        navigation.navigate("multiplayerBattle");
+      }
+    }
+  }, [game]);
 
   return (
     <View>

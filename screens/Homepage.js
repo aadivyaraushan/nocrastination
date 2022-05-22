@@ -22,20 +22,17 @@ function Homepage({ navigation }) {
   };
 
   async function playTap2() {
-    console.log("Loading Sound");
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sfx/tap2.mp3")
     );
     setSound(sound);
 
-    console.log("Playing Sound");
     await sound.playAsync();
   }
 
   useEffect(() => {
     return sound
       ? () => {
-          console.log("Unloading Sound");
           sound.unloadAsync();
         }
       : undefined;
