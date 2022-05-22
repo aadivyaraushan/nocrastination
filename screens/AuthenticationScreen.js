@@ -13,13 +13,11 @@ function AuthenticationScreen({ navigation }) {
   const [sound, setSound] = useState();
 
   async function playSound() {
-    console.log("Loading Sound");
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sfx/tap1.mp3")
     );
     setSound(sound);
 
-    console.log("Playing Sound");
     await sound.playAsync();
   }
 

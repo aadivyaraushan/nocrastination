@@ -10,13 +10,11 @@ function BottomBar() {
   const [sound, setSound] = useState();
 
   async function playTap1() {
-    console.log("Loading Sound");
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sfx/tap1.mp3")
     );
     setSound(sound);
 
-    console.log("Playing Sound");
     await sound.playAsync();
   }
 
@@ -101,6 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "absolute",
     bottom: 0,
+    zIndex: 2,
   },
 });
 

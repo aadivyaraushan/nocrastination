@@ -28,7 +28,6 @@ import { Audio } from "expo-av";
 
 const LoadingMatchmaking = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
-  console.log("User Imported!\n", user);
   const { game, setGame } = useContext(GameContext);
   const [gamesJSX, setGamesJSX] = useState();
   const games = [];

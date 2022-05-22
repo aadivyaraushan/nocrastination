@@ -143,7 +143,6 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        console.log("User's current state: ", user);
                         if (user["items"].indexOf(itemFromArr) != -1) {
                           playPurchaseFailed();
                           alert("You already have this item!");

@@ -7,6 +7,8 @@ import {
   Pressable,
   Animated,
   LogBox,
+  ScrollView,
+  Dimensions,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import Topbar from "../components/Topbar";
@@ -48,43 +50,92 @@ function Quest({ navigation }) {
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
           quests.push(doc.data());
-          // console.log(quests);
         })
       )
       .then(() => {
+        // setArrOfQuestsJSX(
+        //   <ScrollView
+        //     style={{
+        //       // backgroundColor: "black",
+        //       width: "100%",
+        //       height: "70%",
+        //     }}
+        //     contentContainerStyle={{
+        //       justifyContent: "center",
+        //       alignItems: "center",
+        //     }}
+        //     horizontal={true}
+        //   >
+        //     {quests.map((questFromArr, index) => (
+        //       <Pressable
+        //         onPress={() => {
+        //           setQuest(questFromArr);
+        //           // alert("Quest navigating to...\n" + quest["title"]);
+        //           playTap();
+        //           navigation.navigate("questPage");
+        //         }}
+        //         android_disableSound={true}
+        //       >
+        //         <View
+        //           style={{
+        //             display: "flex",
+        //             flexDirection: "column",
+        //             width: "100%",
+        //             height: "40%",
+        //             alignSelf: "center",
+        //             marginRight: 20,
+        //           }}
+        //         >
+        //           <Text key={index} style={styles.questText}>
+        //             {questFromArr["title"]}
+        //           </Text>
+        //           <Image
+        //             source={require("../assets/buildingIcon.png")}
+        //             style={styles.questBuilding}
+        //           />
+        //         </View>
+        //       </Pressable>
+        //     ))}
+        //   </ScrollView>
+        // );
         setArrOfQuestsJSX(
-          <View style={{}}>
-            {quests.map((questFromArr, index) => (
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  alignSelf: index % 2 === 0 ? "flex-start" : "flex-end",
-                  maxHeight: "25%",
-                }}
-                key={index}
-              >
-                <Pressable
-                  onPress={() => {
-                    setQuest(questFromArr);
-                    // alert("Quest navigating to...\n" + quest["title"]);
-                    playTap();
-                    navigation.navigate("questPage");
-                  }}
-                  android_disableSound={true}
-                >
-                  <Text key={index} style={styles.questText}>
-                    {questFromArr["title"]}
-                  </Text>
-
-                  <Image
-                    source={require("../assets/buildingIcon.png")}
-                    style={styles.questBuilding}
-                  />
-                </Pressable>
-              </View>
-            ))}
+          <View style={styles.questsGridContainer}>
+            <View style={styles.questGridContainer}>
+              {quests.map((questFromArr, index) => {
+                return (
+                  <View style={styles.boxContainer} key={index}>
+                    <Pressable
+                      onPress={() => {
+                        setQuest(questFromArr);
+                        playTap();
+                        navigation.navigate("questPage");
+                      }}
+                    >
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "100%",
+                          height: "40%",
+                          alignSelf: "center",
+                          marginRight: 20,
+                        }}
+                      >
+                        <View style={styles.textContainer}>
+                          <Text key={index} style={styles.questText}>
+                            {questFromArr["title"]}
+                          </Text>
+                        </View>
+                        <Image
+                          source={require("../assets/buildingIcon.png")}
+                          style={styles.questBuilding}
+                        />
+                      </View>
+                    </Pressable>
+                  </View>
+                );
+              })}
+            </View>
           </View>
         );
       })
@@ -97,44 +148,12 @@ function Quest({ navigation }) {
         source={require("../assets/background.png")}
         style={styles.bg}
       >
-        <Image
-          source={require("../assets/swordProgressBar.png")}
-          style={styles.sword}
-        />
-        {arrOfQuestsJSX}
-
-        <View
-          style={{
-            width: 50,
-            flexDirection: "column",
-            height: "100%",
-            backgroundColor: "white",
-            alignSelf: "center",
-            justifyContent: "center",
-            position: "absolute",
-          }}
-        >
-          <View
-            style={{
-              width: 50,
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              height: percentComplete,
-              backgroundColor: "#3DDF58",
-              alignSelf: "center",
-              justifyContent: "center",
-              top: 310,
-              paddingLeft: 10,
-              paddingRight: 10,
-            }}
-          />
-        </View>
+        <Topbar style={styles.topbar} />
         <Image
           style={styles.banner}
           source={require("../assets/questsBanner.png")}
         />
-
-        <Topbar style={styles.topbar} />
+        {arrOfQuestsJSX}
         <BottomBar />
       </ImageBackground>
     </View>
@@ -146,12 +165,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "contain",
+    display: "flex",
+    flexDirection: "column",
   },
   banner: {
     width: "100%",
     resizeMode: "contain",
     position: "absolute",
     top: -5,
+    zIndex: 2,
   },
   button: {
     resizeMode: "contain",
@@ -176,6 +198,7 @@ const styles = StyleSheet.create({
     width: 100,
     top: 340,
     zIndex: 1,
+    position: "absolute",
   },
   topbar: {
     zIndex: 2,
@@ -183,18 +206,38 @@ const styles = StyleSheet.create({
     top: 0,
   },
   questText: {
-    fontSize: 15,
+    fontSize: 13,
     textAlign: "center",
     alignSelf: "center",
-    width: "100%",
     color: "white",
     fontFamily: "RetroGaming",
-
-    // if i is even then it should be to the right else to the left
+    flex: 1,
+    flexWrap: "wrap",
   },
   questBuilding: {
-    height: "90%",
+    marginTop: 10,
+    height: 60,
     resizeMode: "contain",
+    alignSelf: "center",
+  },
+  questsGridContainer: {
+    flex: 1,
+    top: 60,
+  },
+  questGridContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 2,
+  },
+  boxContainer: {
+    margin: 2,
+    width: Dimensions.get("window").width / 2 - 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textContainer: {
+    flexDirection: "row",
   },
 });
 
