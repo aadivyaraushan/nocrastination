@@ -1,31 +1,22 @@
 import { StyleSheet, View, Text, Image } from "react-native";
 import { useFonts } from "expo-font";
-import { getFirestore, updateDoc, doc } from "firebase/firestore";
-import { useContext } from "react";
+import { getFirestore, updateDoc, doc, onSnapshot } from "firebase/firestore";
+import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../UserContext";
 
 function Topbar() {
   const { user, setUser } = useContext(UserContext);
-  const [loaded] = useFonts({
-    RetroGaming: require(".././assets/fonts/RetroGaming-Regular.ttf"),
-  });
-
-  if (!loaded) return null;
-
   const db = getFirestore();
-
-  // Level XP calculations
-  // const xpToNextLevel = Math.floor(user["level"] * 100 * user["multiplier"]);
-  // const level = Math.floor(
-  //   (1 + Math.sqrt(1 + (8 * user["currentXp"]) / 50)) / 2
-  // );
-
   const currentLevel = Math.floor(0.07 * Math.sqrt(user["currentXp"]));
-  const xpAtNextLevel = Math.floor(((currentLevel + 1) / 0.07) ** 2);
-  const xpToReachCurrentLevel = Math.floor((currentLevel / 0.07) ** 2);
-
+  const [xpAtNextLevel, setXpAtNextLevel] = useState(
+    Math.floor(((currentLevel + 1) / 0.07) ** 2)
+  );
+  const [currentLevelXp, setCurrentLevelXp] = useState(
+    Math.floor((currentLevel / 0.07) ** 2)
+  );
+  const [level, setLevel] = useState(currentLevel);
   updateDoc(doc(db, "users", user["email"]), {
-    level: currentLevel,
+    level,
   }).then(() => {
     setUser({
       activeQuest: user["activeQuest"],
@@ -44,18 +35,55 @@ function Topbar() {
     });
   });
 
+  const [diamondsLocal, setDiamondsLocal] = useState(
+    <Text style={styles.iconText}>{user["diamonds"]}</Text>
+  );
+  const [coinsLocal, setCoinsLocal] = useState(
+    <Text style={styles.iconText}>{user["coins"]}</Text>
+  );
+  const [progressBar, setProgressBar] = useState(
+    <View style={styles.progress}>
+      <Text style={styles.progressText}>
+        {user["currentXp"] - currentLevelXp}/{xpAtNextLevel - currentLevelXp}
+      </Text>
+    </View>
+  );
+  const [loaded] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    let mounted = true;
+    if (mounted) {
+      setXpAtNextLevel(Math.floor(((level + 1) / 0.07) ** 2));
+      setCurrentLevelXp(Math.floor((level / 0.07) ** 2));
+      setCoinsLocal(<Text style={styles.iconText}>{user["coins"]}</Text>);
+      setDiamondsLocal(<Text style={styles.iconText}>{user["diamonds"]}</Text>);
+      setProgressBar(
+        <View style={styles.progress}>
+          <Text style={styles.progressText}>
+            {user["currentXp"] - Math.floor((user["level"] / 0.07) ** 2)}/
+            {Math.floor(((user["level"] + 1) / 0.07) ** 2) -
+              Math.floor((user["level"] / 0.07) ** 2)}
+          </Text>
+        </View>
+      );
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
+
   return (
     <View style={styles.header}>
       <View style={styles.levels}>
         <View style={styles.level}>
-          <Text style={styles.levelText}>{user["level"]}</Text>
+          <Text style={styles.levelText}>{level}</Text>
         </View>
-        <View style={styles.progress}>
-          <Text style={styles.progressText}>
-            {user["currentXp"] - xpToReachCurrentLevel}/
-            {xpAtNextLevel - xpToReachCurrentLevel}
-          </Text>
-        </View>
+        {progressBar}
       </View>
       <View style={styles.diamonds}>
         <Image
@@ -63,7 +91,7 @@ function Topbar() {
           resizeMode={"contain"}
           source={require(".././assets/ruby.png")}
         />
-        <Text style={styles.iconText}>{user["diamonds"]}</Text>
+        {diamondsLocal}
       </View>
       <View style={styles.diamonds}>
         <Image
@@ -71,7 +99,7 @@ function Topbar() {
           resizeMode={"contain"}
           source={require(".././assets/coin.png")}
         />
-        <Text style={styles.iconText}>{user["coins"]}</Text>
+        {coinsLocal}
       </View>
     </View>
   );
@@ -97,12 +125,10 @@ const styles = StyleSheet.create({
   levelText: {
     color: "white",
     fontSize: 30,
-    padding: 0,
-    width: 40,
-    height: 40,
+    padding: 7,
     textAlign: "center",
     marginVertical: "auto",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
   },
   levels: {
     display: "flex",
@@ -125,9 +151,10 @@ const styles = StyleSheet.create({
   progressText: {
     color: "white",
     textAlign: "center",
-    padding: 0,
+    paddingTop: 1,
+    margin: 3,
     fontSize: 15,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
   },
   icon: {
     width: 30,
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
   },
 });
 

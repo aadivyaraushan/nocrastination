@@ -21,13 +21,15 @@ import {
 import { useContext, useEffect } from "react/cjs/react.development";
 import { UserContext } from "../UserContext.js";
 import { db } from "../firebase";
-import { doc, updateDoc } from "@firebase/firestore";
+import { doc, getDoc, updateDoc } from "@firebase/firestore";
 import { Audio } from "expo-av";
 
 const Shop = () => {
   const [sound, setSound] = useState();
-  const [loaded] = useFonts({
+  const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
   const { user, setUser } = useContext(UserContext);
   const [itemsJSX, setItemsJSX] = useState();
@@ -64,7 +66,7 @@ const Shop = () => {
     getDocs(q)
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
-          items.push(doc.data());
+          items.push(doc);
         })
       )
       .then(() => {
@@ -80,7 +82,7 @@ const Shop = () => {
             horizontal={true}
           >
             {items.map((itemFromArr, index) => {
-              const requirement = itemFromArr["levelRequirement"];
+              const requirement = itemFromArr.data()["levelRequirement"];
               if (requirement > level) {
                 return (
                   <ImageBackground
@@ -95,7 +97,7 @@ const Shop = () => {
                 );
               } else {
                 let image;
-                switch (itemFromArr["name"]) {
+                switch (itemFromArr.data()["name"]) {
                   case "Laser Eyes":
                     image = require("../assets/laserEyes.png");
                     break;
@@ -117,16 +119,18 @@ const Shop = () => {
                 }
 
                 let multiplayerBoost;
-                if (itemFromArr["type"] === "offensive") {
+                if (itemFromArr.data()["type"] === "offensive") {
                   multiplayerBoost = (
                     <Text style={styles.itemFooter}>
-                      +{itemFromArr["damageBoost"]} damage
+                      +{itemFromArr.data()["damageBoost"]} damage
                     </Text>
                   );
-                } else if (itemFromArr["healthBoost"] != "regeneration") {
+                } else if (
+                  itemFromArr.data()["healthBoost"] != "regeneration"
+                ) {
                   multiplayerBoost = (
                     <Text style={styles.itemFooter}>
-                      +{itemFromArr["healthBoost"]} health
+                      +{itemFromArr.data()["healthBoost"]} health
                     </Text>
                   );
                 } else {
@@ -143,59 +147,90 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        if (user["items"].indexOf(itemFromArr) != -1) {
-                          playPurchaseFailed();
-                          alert("You already have this item!");
-                          return;
-                        } else if (
-                          user["coins"] >= itemFromArr["priceCoins"] &&
-                          user["items"].indexOf(itemFromArr) == -1
-                        ) {
-                          user["items"].push(itemFromArr);
-                          user["coins"] =
-                            user["coins"] - itemFromArr["priceCoins"];
-                          setUser({
-                            activeQuest: user["activeQuest"],
-                            coins: user["coins"],
-                            currentXp: user["currentXp"],
-                            diamonds: user["diamonds"],
-                            displayName: user["displayName"],
-                            email: user["email"],
-                            level: user["level"],
-                            multiplier: user["multiplier"],
-                            questsDone: user["questsDone"],
-                            tasks: user["tasks"],
-                            items: user["items"],
-                            emotes: user["emotes"],
-                            avatar: user["avatar"],
-                          });
+                        const items = user["items"];
+                        let purchasedBy;
+                        getDoc(doc(db, "shop", itemFromArr.id))
+                          .then((docSnap) => {
+                            if (docSnap.exists()) {
+                              console.log("Document snapshot exists!");
+                              purchasedBy = docSnap.get("purchasedBy");
+                            } else {
+                              console.log("Document snapshot doesn't exist");
+                            }
+                          })
+                          .then(() => {
+                            console.log(purchasedBy);
+                            if (purchasedBy.indexOf(user["email"]) != -1) {
+                              playPurchaseFailed();
+                              alert("You already have this item!");
+                              return;
+                            } else if (
+                              user["coins"] >=
+                                itemFromArr.data()["priceCoins"] &&
+                              purchasedBy.indexOf(user["email"]) == -1
+                            ) {
+                              items.push(itemFromArr.id);
+                              user["coins"] =
+                                user["coins"] -
+                                itemFromArr.data()["priceCoins"];
+                              console.log(user["coins"]);
+                              console.log(items);
+                              setUser({
+                                activeQuest: user["activeQuest"],
+                                coins: user["coins"],
+                                currentXp: user["currentXp"],
+                                diamonds: user["diamonds"],
+                                displayName: user["displayName"],
+                                email: user["email"],
+                                level: user["level"],
+                                multiplier: user["multiplier"],
+                                questsDone: user["questsDone"],
+                                tasks: user["tasks"],
+                                items: items,
+                                emotes: user["emotes"],
+                                avatar: user["avatar"],
+                              });
+                              purchasedBy.push(user["email"]);
 
-                          updateDoc(doc(db, "users", user["email"]), {
-                            coins: user["coins"] - itemFromArr["priceCoins"],
-                            items: user["items"],
-                          });
+                              updateDoc(doc(db, "users", user["email"]), {
+                                coins:
+                                  user["coins"] -
+                                  itemFromArr.data()["priceCoins"],
+                                items: items,
+                              })
+                                .then(() => {
+                                  updateDoc(doc(db, "shop", itemFromArr.id), {
+                                    purchasedBy: purchasedBy,
+                                  });
+                                })
+                                .then(() => {
+                                  console.log("Updated documents");
+                                });
 
-                          playPurchaseSound();
-                          alert("Item purchased!");
-                        } else {
-                          playPurchaseFailed();
-                          alert("Insufficient funds!");
-                        }
+                              playPurchaseSound();
+                              alert("Item purchased!");
+                            } else {
+                              playPurchaseFailed();
+                              alert("Insufficient funds!");
+                            }
+                          });
                       }}
                       android_disableSound={true}
                     >
-                      <Text style={styles.itemText}>{itemFromArr["name"]}</Text>
+                      <Text style={styles.itemText}>
+                        {itemFromArr.data()["name"]}
+                      </Text>
                       <Image style={styles.itemImage} source={image}></Image>
                       <Image
                         style={styles.coinIcon}
                         source={require("../assets/coin.png")}
                       />
                       <Text style={styles.itemFooter}>
-                        {itemFromArr["priceCoins"]}
+                        {itemFromArr.data()["priceCoins"]}
                       </Text>
                       <Text style={styles.itemFooter}>
-                        {itemFromArr["multiplierXP"]}x XP,{" "}
-                        {itemFromArr["multiplierCoins"]}x coins
+                        {itemFromArr.data()["multiplierXP"]}x XP,{" "}
+                        {itemFromArr.data()["multiplierCoins"]}x coins
                       </Text>
                       {multiplayerBoost}
                     </Pressable>
@@ -210,7 +245,7 @@ const Shop = () => {
     getDocs(q2)
       .then((querySnapshot) =>
         querySnapshot.forEach((doc) => {
-          emotes.push(doc.data());
+          emotes.push(doc);
         })
       )
       .then(() => {
@@ -218,7 +253,7 @@ const Shop = () => {
         setEmotesJSX(
           <ScrollView style={styles.itemsContainer} horizontal={true}>
             {emotes.map((emoteFromArr, index) => {
-              const requirement = emoteFromArr["levelRequirement"];
+              const requirement = emoteFromArr.data()["levelRequirement"];
               if (requirement > level) {
                 return (
                   <ImageBackground
@@ -233,7 +268,7 @@ const Shop = () => {
                 );
               } else {
                 let image;
-                switch (emoteFromArr["name"]) {
+                switch (emoteFromArr.data()["name"]) {
                   case "smile":
                     image = require("../assets/smile.png");
                     break;
@@ -256,44 +291,72 @@ const Shop = () => {
                   >
                     <Pressable
                       onPress={() => {
-                        if (user["diamonds"] >= emoteFromArr["priceDiamonds"]) {
-                          user["emotes"].push(emoteFromArr);
-                          setUser({
-                            activeQuest: user["activeQuest"],
-                            coins: user["coins"],
-                            currentXp: user["currentXp"],
-                            diamonds:
-                              user["diamonds"] - emoteFromArr["priceDiamonds"],
-                            displayName: user["displayName"],
-                            email: user["email"],
-                            level: user["level"],
-                            multiplier: user["multiplier"],
-                            questsDone: user["questsDone"],
-                            tasks: user["tasks"],
-                            emotes: user["emotes"],
-                            items: user["items"],
-                            avatar: user["avatar"],
-                          });
+                        const emotes = user["emotes"];
+                        let purchasedBy;
+                        getDoc(doc(db, "emotes", emoteFromArr.id))
+                          .then((docSnap) => {
+                            if (docSnap.exists()) {
+                              console.log("Document snapshot exists!");
+                              purchasedBy = docSnap.get("purchasedBy");
+                            } else {
+                              console.log("Document snapshot doesn't exist");
+                            }
+                          })
+                          .then(() => {
+                            if (purchasedBy.indexOf(user["email"]) != -1) {
+                              playPurchaseFailed();
+                              alert("You already have this emote!");
+                              return;
+                            } else if (
+                              user["diamonds"] >=
+                                emoteFromArr.data()["priceDiamonds"] &&
+                              purchasedBy.indexOf(user["email"]) == -1
+                            ) {
+                              emotes.push(emoteFromArr.id);
+                              user["diamonds"] =
+                                user["diamonds"] -
+                                emoteFromArr.data()["priceDiamonds"];
+                              setUser({
+                                activeQuest: user["activeQuest"],
+                                coins: user["coins"],
+                                currentXp: user["currentXp"],
+                                diamonds: user["diamonds"],
+                                displayName: user["displayName"],
+                                email: user["email"],
+                                level: user["level"],
+                                multiplier: user["multiplier"],
+                                questsDone: user["questsDone"],
+                                tasks: user["tasks"],
+                                items: user["items"],
+                                emotes: emotes,
+                                avatar: user["avatar"],
+                              });
+                              purchasedBy.push(user["email"]);
 
-                          updateDoc(doc(db, "users", user["email"]), {
-                            diamonds:
-                              user["diamonds"] - emoteFromArr["priceDiamonds"],
-                            emotes: user["emotes"],
+                              updateDoc(doc(db, "users", user["email"]), {
+                                diamonds: user["diamonds"],
+                                emotes: emotes,
+                              }).then(() => {
+                                updateDoc(doc(db, "emotes", emoteFromArr.id), {
+                                  purchasedBy: purchasedBy,
+                                });
+                              });
+
+                              playPurchaseSound();
+                              alert("Emote purchased!");
+                            } else {
+                              playPurchaseFailed();
+                              alert("Insufficient funds!");
+                            }
                           });
-                          playPurchaseSound();
-                          alert("Emote purchased!");
-                        } else {
-                          playPurchaseFailed();
-                          alert("Insufficient funds!");
-                        }
                       }}
                     >
                       <Text style={styles.itemText}>
-                        {emoteFromArr["name"]}
+                        {emoteFromArr.data()["name"]}
                       </Text>
                       <Image style={styles.itemImage} source={image}></Image>
                       <Text style={styles.itemFooter}>
-                        {emoteFromArr["priceDiamonds"]}
+                        {emoteFromArr.data()["priceDiamonds"]}
                       </Text>
                       <Image
                         style={styles.rubyIcon}
@@ -316,11 +379,11 @@ const Shop = () => {
       >
         <Topbar />
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>Emotes</Text>
+          <Text style={styles.bannerText}>EMOTES</Text>
         </View>
         {emotesJSX}
         <View style={styles.itemsBanner}>
-          <Text style={styles.bannerText}>Weapons/Abilities</Text>
+          <Text style={styles.bannerText}>WEAPONS/ABILITIES</Text>
         </View>
         {itemsJSX}
 
@@ -342,10 +405,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bannerText: {
-    fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontSize: 50,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
+    paddingTop: 4,
   },
   itemBackground: {
     width: 150,
@@ -360,8 +424,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   itemText: {
-    fontSize: 15,
-    fontFamily: "RetroGaming",
+    fontSize: 25,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
@@ -371,8 +435,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   itemFooter: {
-    fontSize: 15,
-    fontFamily: "RetroGaming",
+    fontSize: 20,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },

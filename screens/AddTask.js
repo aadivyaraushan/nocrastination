@@ -10,11 +10,17 @@ import {
 import React, { useState, useContext } from "react";
 import { getFirestore, setDoc, doc, updateDoc } from "@firebase/firestore";
 import { UserContext } from "../UserContext";
+import { useFonts } from "expo-font";
 
 const AddTask = () => {
   const [title, setTitle] = useState();
   const [subTasks, setSubTasks] = useState();
   const [difficulty, setDifficulty] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const { user, setUser } = useContext(UserContext);
   const db = getFirestore();
@@ -61,6 +67,7 @@ const AddTask = () => {
     await updateDoc(userRef, {
       tasks: user["tasks"],
     });
+    alert("Task added!");
   };
 
   return (
@@ -69,10 +76,9 @@ const AddTask = () => {
         source={require("../assets/background.png")}
         style={styles.bg}
       >
-        <Image
-          source={require("../assets/addTaskBanner.png")}
-          style={styles.banner}
-        />
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>ADD TASK</Text>
+        </View>
         <View style={styles.inputFieldsContainer}>
           <TextInput
             style={styles.inputFields}
@@ -110,12 +116,15 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   banner: {
-    resizeMode: "contain",
-    position: "absolute",
-    top: 0,
+    backgroundColor: "#DD4141",
     width: "100%",
-    height: "10%",
-    backgroundColor: "black",
+  },
+  bannerText: {
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
+    color: "white",
+    textAlign: "center",
+    paddingTop: 4,
   },
   inputFields: {
     marginTop: 50,
@@ -128,7 +137,7 @@ const styles = StyleSheet.create({
   },
   submit: {
     width: "100%",
-    height: "40%",
+    height: "35%",
     resizeMode: "contain",
     top: 50,
   },

@@ -15,11 +15,17 @@ import { QuestContext } from "../QuestContext";
 import { doc, getDoc, updateDoc } from "@firebase/firestore";
 import { db } from "../firebase";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 const PickATask = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { quest, setQuest } = useContext(QuestContext);
   const [sound, setSound] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   async function playSelect() {
     const { sound } = await Audio.Sound.createAsync(
@@ -29,38 +35,60 @@ const PickATask = ({ navigation }) => {
     await sound.playAsync();
   }
 
-  const pressHandler = (taskTitle) => {
-    playSelect();
-    getDoc(doc(db, "tasks", taskTitle)).then((task) => {
-      const questTemp = task.data();
-      updateDoc(doc(db, "users", user["email"]), {
-        activeQuest: questTemp,
-      })
-        .then(() => {
-          setQuest(questTemp);
-        })
-        .then(() => {
-          setUser({
-            activeQuest: questTemp,
-            avatar: user["avatar"],
-            coins: user["coins"],
-            currentXp: user["currentXp"],
-            diamonds: user["diamonds"],
-            displayName: user["displayName"],
-            email: user["email"],
-            emotes: user["emotes"],
-            items: user["items"],
-            level: user["level"],
-            multiplier: user["multiplier"],
-            questsDone: user["questsDone"],
-            tasks: user["tasks"],
-          });
-        })
-        .then(() => {
-          navigation.navigate("matchmakingSelect");
-        })
-        .catch((err) => console.log(err));
+  const pressHandler = async (taskTitle) => {
+    // playSelect();
+    // awaitgetDoc(doc(db, "tasks", taskTitle)).then((task) => {
+    //   const questTemp = task.data();
+    //   updateDoc(doc(db, "users", user["email"]), {
+    //     activeQuest: taskTitle,
+    //   })
+    //     .then(() => {
+    //       setQuest(questTemp);
+    //     })
+    //     .then(() => {
+    //       setUser({
+    //         activeQuest: taskTitle,
+    //         avatar: user["avatar"],
+    //         coins: user["coins"],
+    //         currentXp: user["currentXp"],
+    //         diamonds: user["diamonds"],
+    //         displayName: user["displayName"],
+    //         email: user["email"],
+    //         emotes: user["emotes"],
+    //         items: user["items"],
+    //         level: user["level"],
+    //         multiplier: user["multiplier"],
+    //         questsDone: user["questsDone"],
+    //         tasks: user["tasks"],
+    //       });
+    //     })
+    //     .then(() => {
+    //       navigation.navigate("matchmakingSelect");
+    //     })
+    //     .catch((err) => console.log(err));
+    // });
+    await playSelect();
+    const docSnap = await getDoc(doc(db, "tasks", taskTitle));
+    await updateDoc(doc(db, "users", user["email"]), {
+      activeQuest: taskTitle,
     });
+    await setQuest(docSnap.data());
+    await setUser({
+      activeQuest: taskTitle,
+      avatar: user["avatar"],
+      coins: user["coins"],
+      currentXp: user["currentXp"],
+      diamonds: user["diamonds"],
+      displayName: user["displayName"],
+      email: user["email"],
+      emotes: user["emotes"],
+      items: user["items"],
+      level: user["level"],
+      multiplier: user["multiplier"],
+      questsDone: user["questsDone"],
+      tasks: user["tasks"],
+    });
+    await navigation.navigate("matchmakingSelect");
   };
 
   return (
@@ -110,13 +138,13 @@ const styles = StyleSheet.create({
   },
   bannerText: {
     fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
   tasksText: {
     fontSize: 20,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },

@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,8 @@ const firebaseConfig = {
   messagingSenderId: "62008867834",
 
   appId: "1:62008867834:web:dc5f198fe532c6cd0dc243",
+
+  databaseURL: "https://nocrastination-d1741-default-rtdb.firebaseio.com",
 };
 
 // Initialize Firebase
@@ -27,4 +30,6 @@ const auth = getAuth(app);
 
 const db = getFirestore(app);
 
-export { auth, db };
+const rtdb = getDatabase(app);
+
+export { auth, db, rtdb };

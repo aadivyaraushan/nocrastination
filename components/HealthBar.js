@@ -1,7 +1,13 @@
 import { StyleSheet, Text, View, Image } from "react-native";
 import React, { useState, useEffect } from "react";
+import { useFonts } from "expo-font";
 
 const HealthBar = ({ health, isLower }) => {
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
   let [bars, setBars] = useState([]);
   useEffect(() => {
     setBars([]);

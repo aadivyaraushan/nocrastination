@@ -28,8 +28,10 @@ import { Audio } from "expo-av";
 function Quest({ navigation }) {
   const { user, setUser } = useContext(UserContext);
   const { quest, setQuest } = useContext(QuestContext);
-  const [loaded] = useFonts({
+  const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
   const percentComplete = user["questsDone"] * 50 + "%";
   const db = getFirestore();
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignSelf: "center",
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     flex: 1,
     flexWrap: "wrap",
   },

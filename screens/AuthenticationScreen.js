@@ -8,9 +8,15 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import { useState, useEffect } from "react";
+import { useFonts } from "expo-font";
 
 function AuthenticationScreen({ navigation }) {
   const [sound, setSound] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(

@@ -12,6 +12,7 @@ import { getDoc, doc } from "firebase/firestore";
 import { UserContext } from "../UserContext.js";
 import { auth, db } from "../firebase";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 let userCred = null;
 
@@ -20,6 +21,11 @@ function Login({ navigation }) {
   const [password, onChangePassword] = useState("");
   const [sound, setSound] = useState();
   const { user, setUser } = useContext(UserContext);
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email, password)

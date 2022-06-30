@@ -8,18 +8,13 @@ import {
 import React, { useState, useContext, useEffect } from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import {
-  deleteDoc,
-  doc,
-  onSnapshot,
-  setDoc,
-  query,
-  collection,
-  where,
-} from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
+import { set, ref } from "firebase/database";
 import { UserContext } from "../UserContext";
-import { db } from "../firebase";
+import { db, rtdb } from "../firebase";
 import { GameContext } from "../GameContext";
+import { QuestContext } from "../QuestContext";
+import { useFonts } from "expo-font";
 
 const id = Math.floor(Math.random() * Math.floor(Math.random() * Date.now()));
 console.log("ID: ", id);
@@ -27,6 +22,13 @@ console.log("ID: ", id);
 const AddGame = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { game, setGame } = useContext(GameContext);
+  const { quest, setQuest } = useContext(QuestContext);
+
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const [bodyJSX, setBodyJSX] = useState(
     <View style={styles.container}>
@@ -36,31 +38,49 @@ const AddGame = ({ navigation }) => {
   );
 
   useEffect(() => {
-    setDoc(doc(db, "games", String(id)), {
-      id: String(id),
-      created: Date.now(),
-      finished: false,
-      started: false,
-      player1: user,
-      player2: null,
-    })
-      .then(() => {
-        console.log("Game added to database");
-        setGame({
-          id: String(id),
-          created: Date.now(),
-          finished: false,
-          started: false,
-          player1: user,
-          player2: null,
-        });
-      })
-      .then(() => {
-        onSnapshot(doc(db, "games", String(id)), (snapshot) => {
-          setGame(snapshot.data());
-        });
-      })
-      .catch((error) => console.log(error));
+    // setDoc(doc(db, "games", String(id)), {
+    //   id: String(id),
+    //   created: Date.now(),
+    //   finished: false,
+    //   started: false,
+    //   player1: {
+    //     difficultyQuest: quest["difficulty"],
+    //     subTasks: quest["subTasks"],
+    //     taskTitle: quest["title"],
+    //     avatar: user["avatar"],
+    //     displayName: user["displayName"],
+    //     items: user["items"],
+    //     emotes: user["emotes"],
+    //   },
+    //   player2: null,
+    // })
+    //   .then(() => {
+    //     console.log("Game added to database");
+    //     setGame({
+    //       id: String(id),
+    //       created: Date.now(),
+    //       finished: false,
+    //       started: false,
+    //       player1: {
+    //         email: user["email"],
+    //         difficultyQuest: quest["difficulty"],
+    //         subTasks: quest["subTasks"],
+    //         taskTitle: quest["title"],
+    //         avatar: user["avatar"],
+    //         displayName: user["displayName"],
+    //         items: user["items"],
+    //         emotes,
+    //         level: user["level"],
+    //       },
+    //       player2: null,
+    //     });
+    //   })
+    //   .then(() => {
+    //     onSnapshot(doc(db, "games", String(id)), (snapshot) => {
+    //       setGame(snapshot.data());
+    //     });
+    //   })
+    //   .catch((error) => console.log(error));
   }, []);
 
   useEffect(() => {
@@ -119,7 +139,7 @@ const styles = StyleSheet.create({
   },
   bannerText: {
     fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
@@ -128,7 +148,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     alignSelf: "center",
   },
   container: {

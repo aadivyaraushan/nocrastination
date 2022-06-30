@@ -11,10 +11,16 @@ import Topbar from ".././components/Topbar";
 import { UserContext } from "../UserContext";
 import BottomBar from "../components/BottomBar";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 function Homepage({ navigation }) {
-  const { user, setUser } = useContext(UserContext);
   const [sound, setSound] = useState();
+
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const handleQuest = () => {
     playTap2();
@@ -49,7 +55,7 @@ function Homepage({ navigation }) {
 
         <Pressable
           onPress={handleQuest}
-          style={styles.QuestButton}
+          style={styles.questButton}
           android_disableSound={true}
         >
           <Image
@@ -63,7 +69,7 @@ function Homepage({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  QuestButton: {
+  questButton: {
     width: "50%",
     alignSelf: "center",
     top: 350,

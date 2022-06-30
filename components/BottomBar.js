@@ -4,10 +4,15 @@ import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react/cjs/react.development";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 function BottomBar() {
   const navigation = useNavigation();
   const [sound, setSound] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+  });
 
   async function playTap1() {
     const { sound } = await Audio.Sound.createAsync(

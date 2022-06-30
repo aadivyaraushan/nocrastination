@@ -24,8 +24,10 @@ import { OrganisationContext } from "../OrganisationContext";
 import { Audio } from "expo-av";
 
 const Organisations = ({ navigation }) => {
-  const [loaded] = useFonts({
+  const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
   const [organisationsJSX, setOrganisationsJSX] = useState();
   const { organisation, setOrganisation } = useContext(OrganisationContext);
@@ -98,7 +100,7 @@ const Organisations = ({ navigation }) => {
       >
         <Topbar />
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>Organisations</Text>
+          <Text style={styles.bannerText}>ORGANISATIONS</Text>
         </View>
         <View style={styles.organisationsContainer}>{organisationsJSX}</View>
         <BottomBar />
@@ -121,10 +123,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bannerText: {
-    fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
+    paddingTop: 4,
   },
   organisationBackground: {
     width: 320,
@@ -134,14 +137,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   organisationName: {
-    fontSize: 25,
-    fontFamily: "RetroGaming",
+    fontSize: 45,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
   organisationDetails: {
-    fontSize: 13,
-    fontFamily: "RetroGaming",
+    fontSize: 25,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "left",
   },
@@ -151,8 +154,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   organisationAwardText: {
-    fontSize: 30,
-    fontFamily: "RetroGaming",
+    fontSize: 40,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "right",
     zIndex: 2,
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
     height: 30,
     width: 30,
-    top: 65,
+    top: 62,
     left: 210,
   },
 });

@@ -25,6 +25,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
 import { GameContext } from "../GameContext";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 const LoadingMatchmaking = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -32,7 +33,11 @@ const LoadingMatchmaking = ({ navigation }) => {
   const [gamesJSX, setGamesJSX] = useState();
   const games = [];
   const [sound, setSound] = useState();
-
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
   async function playSelect() {
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sfx/tap2.mp3")
@@ -80,8 +85,8 @@ const LoadingMatchmaking = ({ navigation }) => {
           <View style={styles.gamesContainer}>
             {games.map((gameFromGames, index) => {
               if (
-                gameFromGames["player1"]["activeQuest"]["difficulty"] ===
-                  user["activeQuest"]["difficulty"] &&
+                gameFromGames["player1"]["difficultyQuest"] ===
+                  quest["difficulty"] &&
                 gameFromGames["player1"]["level"] === user["level"]
               ) {
                 return (
@@ -159,7 +164,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     alignSelf: "center",
   },
   banner: {
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
   },
   bannerText: {
     fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
@@ -195,13 +200,13 @@ const styles = StyleSheet.create({
   gamePressable: {},
   gameText: {
     fontSize: 30,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
   gameDetails: {
     fontSize: 15,
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "left",
   },

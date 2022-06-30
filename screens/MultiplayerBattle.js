@@ -18,6 +18,7 @@ import { deleteDoc, doc, updateDoc } from "@firebase/firestore";
 import { db } from "../firebase";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
+import { useFonts } from "expo-font";
 
 const MultiplayerBattle = ({ route, navigation }) => {
   const rewardData = route.params;
@@ -30,13 +31,14 @@ const MultiplayerBattle = ({ route, navigation }) => {
   const [player2Count, setPlayer2Count] = useState(80);
   const [player1AttackPressed, setPlayer1AttackPressed] = useState(false);
   const [player2AttackPressed, setPlayer2AttackPressed] = useState(false);
-  const [subTasksP1, setSubTasksP1] = useState(
-    game["player1"]["activeQuest"]["subTasks"]
-  );
-  const [subTasksP2, setSubTasksP2] = useState(
-    game["player2"]["activeQuest"]["subTasks"]
-  );
+  const [subTasksP1, setSubTasksP1] = useState(game["player1"]["subTasks"]);
+  const [subTasksP2, setSubTasksP2] = useState(game["player2"]["subTasks"]);
   const [sound, setSound] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   // Sound functions
   async function playDamaged() {
@@ -111,8 +113,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
       player2HealthBoost += item["healthBoost"];
   }
   const player2DamagePerSubTask =
-    100 / game["player2"]["activeQuest"]["subTasks"].length +
-    player2DamageBoost;
+    100 / game["player2"]["subTasks"].length + player2DamageBoost;
   let player2HealthVar = 100 + player2HealthBoost;
 
   // Computing player2 avatar
@@ -245,16 +246,20 @@ const MultiplayerBattle = ({ route, navigation }) => {
                       } else {
                         if (game["player1"]["email"] === user["email"]) {
                           playAttack();
-                          user["activeQuest"]["subTasks"].splice(
-                            user["activeQuest"]["subTasks"].indexOf(subTask),
-                            1
-                          );
+                          let subTasks = quest["subTasks"];
+                          subTasks.splice(subTasks.indexOf(subTask), 1);
                           console.log(
                             "removed ",
                             subTask,
                             " from ",
-                            user["activeQuest"]["subTasks"]
+                            quest["subTasks"]
                           );
+                          quest = {
+                            difficulty: quest["difficulty"],
+                            owner: quest["owner"],
+                            subTasks,
+                            title: quest["title"],
+                          };
                           setUser({
                             activeQuest: user["activeQuest"],
                             avatar: user["avatar"],
@@ -269,23 +274,18 @@ const MultiplayerBattle = ({ route, navigation }) => {
                             questsDone: user["questsDone"],
                             tasks: user["tasks"],
                           });
-
-                          updateDoc(doc(db, "users", user["email"]), {
-                            activeQuest: user["activeQuest"],
-                          });
+                          setQuest(quest);
+                          updateDoc(doc(db, "tasks", quest["title"]), quest);
                         } else {
                           playDamaged();
-                          game["player1"]["activeQuest"]["subTasks"].splice(
-                            game["player1"]["activeQuest"]["subTasks"].indexOf(
-                              subTask
-                            ),
+                          game["player1"]["subTasks"].splice(
+                            game["player1"]["subTasks"].indexOf(subTask),
                             1
                           );
                           updateDoc(
                             doc(db, "users", game["player1"]["email"]),
                             {
-                              activeQuest:
-                                game["player1"]["email"]["activeQuest"],
+                              subTasks: game["player1"]["subTasks"],
                             }
                           );
                         }
@@ -324,8 +324,8 @@ const MultiplayerBattle = ({ route, navigation }) => {
                       } else {
                         if (game["player2"]["email"] === user["email"]) {
                           playAttack();
-                          user["activeQuest"]["subTasks"].splice(
-                            user["activeQuest"]["subTasks"].indexOf(subTask),
+                          quest["subTasks"].splice(
+                            quest["subTasks"].indexOf(subTask),
                             1
                           );
                           setUser({
@@ -343,22 +343,17 @@ const MultiplayerBattle = ({ route, navigation }) => {
                             tasks: user["tasks"],
                           });
 
-                          updateDoc(doc(db, "users", user["email"]), {
-                            activeQuest: user["activeQuest"],
-                          });
+                          updateDoc(doc(db, "tasks", quest["title"]), quest);
                         } else {
                           playDamaged();
-                          game["player2"]["activeQuest"]["subTasks"].splice(
-                            game["player2"]["activeQuest"]["subTasks"].indexOf(
-                              subTask
-                            ),
+                          game["player2"]["subTasks"].splice(
+                            game["player2"]["subTasks"].indexOf(subTask),
                             1
                           );
                           updateDoc(
                             doc(db, "users", game["player2"]["email"]),
                             {
-                              activeQuest:
-                                game["player2"]["email"]["activeQuest"],
+                              subTasks: game["player2"]["subTasks"],
                             }
                           );
                         }
@@ -422,7 +417,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 25,
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
   },
   textContainer: {
     flex: 1,
@@ -433,7 +428,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 30,
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     // marginLeft: 30,
     // marginTop: 5,
     // marginBottom: 30,

@@ -10,9 +10,16 @@ import { useContext } from "react/cjs/react.development";
 import { OrganisationContext } from "../OrganisationContext";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
+import { useFonts } from "expo-font";
 
 const Organisation = () => {
   const { organisation, setOrganisation } = useContext(OrganisationContext);
+
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   return (
     <View>
@@ -79,14 +86,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bannerTextSecondary: {
-    fontSize: 30,
-    fontFamily: "RetroGaming",
+    fontSize: 50,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
   bannerText: {
-    fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },
@@ -97,8 +104,8 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   text: {
-    fontSize: 15,
-    fontFamily: "RetroGaming",
+    fontSize: 20,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
   },

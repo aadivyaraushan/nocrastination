@@ -12,6 +12,11 @@ const QuestActive = ({ route, navigation }) => {
   const rewardData = route.params;
   const { user, setUser } = useContext(UserContext);
   const db = getFirestore();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const potentialBackgrounds = [
     require("../assets/activePage1.png"),
@@ -116,7 +121,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
 
     // if i is even then it should be to the right else to the left
   },
@@ -126,6 +131,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
     color: "white",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
   },
 });

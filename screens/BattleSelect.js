@@ -11,9 +11,15 @@ import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
 import { useState } from "react/cjs/react.development";
 import { Audio } from "expo-av";
+import { useFonts } from "expo-font";
 
 const BattleSelect = ({ navigation }) => {
   const [sound, setSound] = useState();
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   async function playTap() {
     const { sound } = await Audio.Sound.createAsync(
@@ -32,7 +38,7 @@ const BattleSelect = ({ navigation }) => {
       >
         <Topbar />
         <View style={styles.banner}>
-          <Text style={styles.bannerText}>Battle</Text>
+          <Text style={styles.bannerText}>BATTLE</Text>
         </View>
         <Pressable
           style={styles.buttonContainer1}
@@ -84,6 +90,7 @@ const styles = StyleSheet.create({
   buttonContainer2: {
     width: 400,
     top: -20,
+    marginTop: 20,
   },
   button: {
     resizeMode: "contain",
@@ -96,9 +103,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bannerText: {
-    fontSize: 40,
-    fontFamily: "RetroGaming",
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
     color: "white",
     textAlign: "center",
+    paddingTop: 4,
   },
 });

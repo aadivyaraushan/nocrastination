@@ -13,12 +13,18 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, setDoc, getFirestore, doc } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
 import { UserContext } from "../UserContext.js";
+import { useFonts } from "expo-font";
 
 function Signup({ navigation }) {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [displayName, onChangeDisplayName] = useState("");
   const { user, setUser } = useContext(UserContext);
+  const [] = useFonts({
+    RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
+  });
 
   const handleSignUp = async () => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -31,14 +37,16 @@ function Signup({ navigation }) {
       const docRef = doc(db, "users", email);
 
       const data = {
+        activeQuest: "",
+        avatar: "",
         coins: 0,
         currentXp: 0,
         diamonds: 0,
         displayName: displayName,
         email: email,
+        emotes: [],
+        items: [],
         level: 1,
-        multiplier: 1,
-        questsToDo: 0,
         questsDone: 0,
         tasks: [],
       };

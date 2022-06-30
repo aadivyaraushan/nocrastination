@@ -19,8 +19,10 @@ const QuestPage = ({ route, navigation }) => {
   const rewardData = route.params;
   const { quest, setQuest } = useContext(QuestContext);
   const [duration, setDuration] = useState(0);
-  const [loaded] = useFonts({
+  const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
+    InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
+    PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
   let rewardsJSX = (
     <>
@@ -133,14 +135,14 @@ const styles = StyleSheet.create({
   bannerText: {
     color: "#fff",
     textAlign: "center",
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     fontSize: 25,
     flex: 1,
     flexWrap: "wrap",
     alignSelf: "center",
   },
   paragraphText: {
-    fontFamily: "RetroGaming",
+    fontFamily: "PlayMeGames",
     color: "white",
     fontSize: 30,
   },
