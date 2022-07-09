@@ -70,7 +70,7 @@ const QuestActive = ({ route, navigation }) => {
               currentXp:
                 user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
               tasks: user["tasks"],
-            });
+            }).then(() => console.log("updateDoc for quest rewards"));
           },
         },
         {

@@ -59,12 +59,18 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "row",
+    position: "absolute",
+    bottom: 250,
+    right: 0,
+    width: "100%",
   },
   containerUpper: {
     display: "flex",
     flexDirection: "row-reverse",
-    position: "relative",
-    top: 150,
+    position: "absolute",
+    top: 40,
+    right: 0,
+    width: "100%",
   },
   heart: {
     width: 30,

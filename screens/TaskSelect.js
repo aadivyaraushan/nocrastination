@@ -36,58 +36,9 @@ const PickATask = ({ navigation }) => {
   }
 
   const pressHandler = async (taskTitle) => {
-    // playSelect();
-    // awaitgetDoc(doc(db, "tasks", taskTitle)).then((task) => {
-    //   const questTemp = task.data();
-    //   updateDoc(doc(db, "users", user["email"]), {
-    //     activeQuest: taskTitle,
-    //   })
-    //     .then(() => {
-    //       setQuest(questTemp);
-    //     })
-    //     .then(() => {
-    //       setUser({
-    //         activeQuest: taskTitle,
-    //         avatar: user["avatar"],
-    //         coins: user["coins"],
-    //         currentXp: user["currentXp"],
-    //         diamonds: user["diamonds"],
-    //         displayName: user["displayName"],
-    //         email: user["email"],
-    //         emotes: user["emotes"],
-    //         items: user["items"],
-    //         level: user["level"],
-    //         multiplier: user["multiplier"],
-    //         questsDone: user["questsDone"],
-    //         tasks: user["tasks"],
-    //       });
-    //     })
-    //     .then(() => {
-    //       navigation.navigate("matchmakingSelect");
-    //     })
-    //     .catch((err) => console.log(err));
-    // });
     await playSelect();
     const docSnap = await getDoc(doc(db, "tasks", taskTitle));
-    await updateDoc(doc(db, "users", user["email"]), {
-      activeQuest: taskTitle,
-    });
     await setQuest(docSnap.data());
-    await setUser({
-      activeQuest: taskTitle,
-      avatar: user["avatar"],
-      coins: user["coins"],
-      currentXp: user["currentXp"],
-      diamonds: user["diamonds"],
-      displayName: user["displayName"],
-      email: user["email"],
-      emotes: user["emotes"],
-      items: user["items"],
-      level: user["level"],
-      multiplier: user["multiplier"],
-      questsDone: user["questsDone"],
-      tasks: user["tasks"],
-    });
     await navigation.navigate("matchmakingSelect");
   };
 

@@ -45,7 +45,9 @@ const AddTask = () => {
       owner: user["email"],
     };
 
-    await setDoc(doc(db, "tasks", title), data);
+    await setDoc(doc(db, "tasks", title), data).then(() =>
+      console.log("setDoc for setting task")
+    );
     user["tasks"].unshift(data["title"]);
     setUser({
       activeQuest: user["activeQuest"],
@@ -66,7 +68,7 @@ const AddTask = () => {
     const userRef = doc(db, "users", user["email"]);
     await updateDoc(userRef, {
       tasks: user["tasks"],
-    });
+    }).then(() => console.log("updateDoc for adding task"));
     alert("Task added!");
   };
 

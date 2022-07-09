@@ -15,25 +15,28 @@ function Topbar() {
     Math.floor((currentLevel / 0.07) ** 2)
   );
   const [level, setLevel] = useState(currentLevel);
-  updateDoc(doc(db, "users", user["email"]), {
-    level,
-  }).then(() => {
-    setUser({
-      activeQuest: user["activeQuest"],
-      avatar: user["avatar"],
-      coins: user["coins"],
-      currentXp: user["currentXp"],
-      diamonds: user["diamonds"],
-      displayName: user["displayName"],
-      email: user["email"],
-      emotes: user["emotes"],
-      items: user["items"],
-      level: currentLevel,
-      multiplier: user["multiplier"],
-      questsDone: user["questsDone"],
-      tasks: user["tasks"],
+  useEffect(() => {
+    updateDoc(doc(db, "users", user["email"]), {
+      level,
+    }).then(() => {
+      console.log("updateDoc for level");
+      setUser({
+        activeQuest: user["activeQuest"],
+        avatar: user["avatar"],
+        coins: user["coins"],
+        currentXp: user["currentXp"],
+        diamonds: user["diamonds"],
+        displayName: user["displayName"],
+        email: user["email"],
+        emotes: user["emotes"],
+        items: user["items"],
+        level: currentLevel,
+        multiplier: user["multiplier"],
+        questsDone: user["questsDone"],
+        tasks: user["tasks"],
+      });
     });
-  });
+  }, []);
 
   const [diamondsLocal, setDiamondsLocal] = useState(
     <Text style={styles.iconText}>{user["diamonds"]}</Text>
@@ -70,6 +73,26 @@ function Topbar() {
           </Text>
         </View>
       );
+      // updateDoc(doc(db, "users", user["email"]), {
+      //   level,
+      // }).then(() => {
+      //   console.log("updateDoc for level");
+      //   setUser({
+      //     activeQuest: user["activeQuest"],
+      //     avatar: user["avatar"],
+      //     coins: user["coins"],
+      //     currentXp: user["currentXp"],
+      //     diamonds: user["diamonds"],
+      //     displayName: user["displayName"],
+      //     email: user["email"],
+      //     emotes: user["emotes"],
+      //     items: user["items"],
+      //     level: currentLevel,
+      //     multiplier: user["multiplier"],
+      //     questsDone: user["questsDone"],
+      //     tasks: user["tasks"],
+      //   });
+      // });
     }
 
     return () => {

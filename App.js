@@ -24,6 +24,7 @@ import MultiplayerBattle from "./screens/MultiplayerBattle.js";
 import MatchmakingSelect from "./screens/MatchmakingSelect.js";
 import TaskSelect from "./screens/TaskSelect.js";
 import AddGame from "./screens/AddGame.js";
+import { LogBox } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +107,10 @@ export default function App() {
       </QuestContext.Provider>
     </UserContext.Provider>
   );
+
+  LogBox.ignoreLogs([
+    "Warning: Async Storage has been extracted from react-native core",
+  ]);
 }
 
 const styles = StyleSheet.create({});

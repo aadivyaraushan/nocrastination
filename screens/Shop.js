@@ -199,12 +199,13 @@ const Shop = () => {
                                 items: items,
                               })
                                 .then(() => {
+                                  console.log("updated user coins");
                                   updateDoc(doc(db, "shop", itemFromArr.id), {
                                     purchasedBy: purchasedBy,
                                   });
                                 })
                                 .then(() => {
-                                  console.log("Updated documents");
+                                  console.log("Updated purchasedBy");
                                 });
 
                               playPurchaseSound();
@@ -336,11 +337,19 @@ const Shop = () => {
                               updateDoc(doc(db, "users", user["email"]), {
                                 diamonds: user["diamonds"],
                                 emotes: emotes,
-                              }).then(() => {
-                                updateDoc(doc(db, "emotes", emoteFromArr.id), {
-                                  purchasedBy: purchasedBy,
+                              })
+                                .then(() => {
+                                  console.log("updated diamonds and emotes");
+                                  updateDoc(
+                                    doc(db, "emotes", emoteFromArr.id),
+                                    {
+                                      purchasedBy: purchasedBy,
+                                    }
+                                  );
+                                })
+                                .then(() => {
+                                  console.log("Updated purchasedBy");
                                 });
-                              });
 
                               playPurchaseSound();
                               alert("Emote purchased!");

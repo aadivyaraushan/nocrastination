@@ -51,7 +51,9 @@ function Signup({ navigation }) {
         tasks: [],
       };
 
-      await setDoc(docRef, data);
+      await setDoc(docRef, data).then(() =>
+        console.log("setDoc for setting user")
+      );
 
       await setUser(data);
 

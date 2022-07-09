@@ -55,51 +55,6 @@ function Quest({ navigation }) {
         })
       )
       .then(() => {
-        // setArrOfQuestsJSX(
-        //   <ScrollView
-        //     style={{
-        //       // backgroundColor: "black",
-        //       width: "100%",
-        //       height: "70%",
-        //     }}
-        //     contentContainerStyle={{
-        //       justifyContent: "center",
-        //       alignItems: "center",
-        //     }}
-        //     horizontal={true}
-        //   >
-        //     {quests.map((questFromArr, index) => (
-        //       <Pressable
-        //         onPress={() => {
-        //           setQuest(questFromArr);
-        //           // alert("Quest navigating to...\n" + quest["title"]);
-        //           playTap();
-        //           navigation.navigate("questPage");
-        //         }}
-        //         android_disableSound={true}
-        //       >
-        //         <View
-        //           style={{
-        //             display: "flex",
-        //             flexDirection: "column",
-        //             width: "100%",
-        //             height: "40%",
-        //             alignSelf: "center",
-        //             marginRight: 20,
-        //           }}
-        //         >
-        //           <Text key={index} style={styles.questText}>
-        //             {questFromArr["title"]}
-        //           </Text>
-        //           <Image
-        //             source={require("../assets/buildingIcon.png")}
-        //             style={styles.questBuilding}
-        //           />
-        //         </View>
-        //       </Pressable>
-        //     ))}
-        //   </ScrollView>
-        // );
         setArrOfQuestsJSX(
           <View style={styles.questsGridContainer}>
             <View style={styles.questGridContainer}>
