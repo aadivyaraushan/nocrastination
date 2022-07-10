@@ -72,19 +72,33 @@ function Login({ navigation }) {
           style={styles.banner}
         />
         <View style={styles.inputFieldsContainer}>
-          <TextInput
-            style={styles.inputFields}
-            onChangeText={onChangeEmail}
-            value={email}
-            placeholder="Email"
-          />
-          <TextInput
-            style={styles.inputFields}
-            onChangeText={onChangePassword}
-            value={password}
-            placeholder="Password"
-            secureTextEntry
-          />
+          <ImageBackground
+            source={require("../assets/inputFieldBubble.png")}
+            style={styles.inputFieldContainer}
+          >
+            <TextInput
+              style={styles.inputFields}
+              onChangeText={onChangeEmail}
+              value={email}
+              placeholder="Email"
+              placeholderTextColor="black"
+            />
+          </ImageBackground>
+
+          <ImageBackground
+            source={require("../assets/inputFieldBubble.png")}
+            style={styles.inputFieldContainer}
+          >
+            <TextInput
+              style={styles.inputFields}
+              onChangeText={onChangePassword}
+              value={password}
+              placeholder="Password"
+              placeholderTextColor="black"
+              secureTextEntry
+            />
+          </ImageBackground>
+
           <Pressable onPress={handleLogin} android_disableSound={true}>
             <Image
               source={require("./../assets/buttons/submit.png")}
@@ -121,18 +135,27 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   inputFields: {
-    marginTop: 50,
-    width: "100%",
-    backgroundColor: "white",
-    height: "10%",
+    backgroundColor: "transparent",
+    fontFamily: "PlayMeGames",
+    color: "black",
+    marginLeft: 15,
+    marginTop: 10,
   },
   inputFieldsContainer: {
-    marginTop: 50,
+    marginTop: 80,
+    display: "flex",
   },
   submit: {
     width: "100%",
     height: "40%",
     resizeMode: "contain",
     top: 50,
+  },
+  inputFieldContainer: {
+    resizeMode: "cover",
+    width: 320,
+    height: 50,
+    marginTop: 25,
+    marginLeft: 15,
   },
 });

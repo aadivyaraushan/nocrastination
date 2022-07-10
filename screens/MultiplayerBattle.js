@@ -187,36 +187,36 @@ const MultiplayerBattle = ({ route, navigation }) => {
       if (snapshot.exists()) {
         if (isPlayerOne) {
           switch (snapshot.val()["player1"]) {
-            case "superhero":
-              setPlayer1Avatar(require("../assets/superhero.png"));
-              break;
             case "wizard":
-              setPlayer1Avatar(require("../assets/wizard.png"));
+              setPlayer1Avatar(require("../assets/avatars/wizard.gif"));
+              break;
+            case "necromancer":
+              setPlayer1Avatar(require("../assets/avatars/necromancer.gif"));
               break;
           }
           switch (snapshot.val()["player2"]) {
-            case "superhero":
-              setPlayer2Avatar(require("../assets/superhero.png"));
-              break;
             case "wizard":
-              setPlayer2Avatar(require("../assets/wizard.png"));
+              setPlayer2Avatar(require("../assets/avatars/wizard.gif"));
+              break;
+            case "necromancer":
+              setPlayer2Avatar(require("../assets/avatars/necromancer.gif"));
               break;
           }
         } else {
           switch (snapshot.val()["player2"]) {
-            case "superhero":
-              setPlayer1Avatar(require("../assets/superhero.png"));
+            case "necromancer":
+              setPlayer1Avatar(require("../assets/avatars/necromancer.gif"));
               break;
             case "wizard":
-              setPlayer1Avatar(require("../assets/wizard.png"));
+              setPlayer1Avatar(require("../assets/avatars/wizard.gif"));
               break;
           }
           switch (snapshot.val()["player1"]) {
-            case "superhero":
-              setPlayer2Avatar(require("../assets/superhero.png"));
+            case "necromancer":
+              setPlayer2Avatar(require("../assets/avatars/necromancer.gif"));
               break;
             case "wizard":
-              setPlayer2Avatar(require("../assets/wizard.png"));
+              setPlayer2Avatar(require("../assets/avatars/wizard.gif"));
               break;
           }
         }
@@ -429,6 +429,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginBottom: 40,
     resizeMode: "contain",
+    transform: [{ scaleX: -1 }],
   },
   upperAvatar: {
     width: 170,
@@ -436,7 +437,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 80,
     right: 20,
-    transform: [{ scaleX: -1 }],
     resizeMode: "contain",
   },
 });
