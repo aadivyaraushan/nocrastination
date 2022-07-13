@@ -5,6 +5,7 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  Dimensions
 } from "react-native";
 import { Audio } from "expo-av";
 import { useState, useEffect } from "react";
@@ -88,7 +89,8 @@ function AuthenticationScreen({ navigation }) {
     </View>
   );
 }
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 export default AuthenticationScreen;
 
 const styles = StyleSheet.create({
@@ -108,8 +110,8 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     justifyContent: "flex-start",
   },
   buttons: {
