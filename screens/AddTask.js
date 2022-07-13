@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   Pressable,
+  Dimensions
 } from "react-native";
 import React, { useState, useContext } from "react";
 import { getFirestore, setDoc, doc, updateDoc } from "@firebase/firestore";
@@ -158,11 +159,13 @@ const AddTask = ({ navigation }) => {
     </View>
   );
 };
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
   },
   banner: {
     backgroundColor: "#DD4141",
