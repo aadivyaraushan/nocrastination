@@ -5,6 +5,7 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  Dimensions
 } from "react-native";
 import { useContext, useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -110,6 +111,8 @@ function Login({ navigation }) {
     </View>
   );
 }
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export default Login;
 
@@ -130,8 +133,8 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     justifyContent: "flex-start",
   },
   inputFields: {
