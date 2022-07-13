@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Image,
   Pressable,
+  Dimensions
 } from "react-native";
 import React, { useEffect } from "react";
 import { useContext, useState } from "react/cjs/react.development";
@@ -371,13 +372,14 @@ const MultiplayerBattle = ({ route, navigation }) => {
     </View>
   );
 };
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 export default MultiplayerBattle;
 
 const styles = StyleSheet.create({
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     resizeMode: "contain",
     display: "flex",
     flexDirection: "column-reverse",
