@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ImageBackground, Alert } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, Alert, Dimensions } from "react-native";
 import { useContext, useMemo, useState } from "react";
 import { QuestContext } from "../QuestContext";
 import { useFonts } from "expo-font";
@@ -106,13 +106,14 @@ const QuestActive = ({ route, navigation }) => {
     </View>
   );
 };
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 export default QuestActive;
 
 const styles = StyleSheet.create({
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     resizeMode: "contain",
   },
   disclaimerText: {
