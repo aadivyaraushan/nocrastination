@@ -5,6 +5,7 @@ import {
   Text,
   View,
   Image,
+  Dimensions
 } from "react-native";
 import { useContext, useState } from "react";
 import { QuestContext } from "../QuestContext";
@@ -114,13 +115,14 @@ const QuestPage = ({ route, navigation }) => {
     </View>
   );
 };
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 export default QuestPage;
 
 const styles = StyleSheet.create({
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     justifyContent: "flex-start",
     alignItems: "center",
   },
