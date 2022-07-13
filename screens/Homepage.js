@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Pressable,
   Image,
+  Dimensions
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import Topbar from ".././components/Topbar";
@@ -67,6 +68,8 @@ function Homepage({ navigation }) {
     </View>
   );
 }
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   questButton: {
@@ -76,8 +79,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     resizeMode: "contain",
   },
   container: {
