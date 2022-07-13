@@ -6,6 +6,7 @@ import {
   Text,
   View,
   Image,
+  Dimensions
 } from "react-native";
 import React, { useState } from "react";
 import Topbar from "../components/Topbar";
@@ -168,13 +169,15 @@ const LoadingMatchmaking = ({ navigation }) => {
     </>
   );
 };
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export default LoadingMatchmaking;
 
 const styles = StyleSheet.create({
   bg: {
-    width: "100%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     resizeMode: "contain",
     display: "flex",
   },
