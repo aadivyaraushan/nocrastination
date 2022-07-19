@@ -10,7 +10,7 @@ import {
 import React, { useState } from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import { useContext, useEffect } from "react/cjs/react.development";
+import { useContext, useEffect } from "react";
 import { get, ref, child, update } from "firebase/database";
 import { db, rtdb } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
@@ -101,11 +101,12 @@ const LoadingMatchmaking = ({ navigation }) => {
         const [key, value] = entry;
         if (
           value["difficulty"]["player1"] === quest["difficulty"] &&
-          value["levels"]["player1"] === user["level"]
+          value["levels"]["player1"] === user["level"] &&
+          value["emails"]["player1"] != user["email"]
         ) {
           jsx.push(
             <ImageBackground
-              source={require("../assets/organisationBG.png")}
+              source={require("../assets/backgrounds/panels/organisationBG.png")}
               style={styles.gameBackground}
               key={Math.random() * (index + 2)}
             >
@@ -141,7 +142,7 @@ const LoadingMatchmaking = ({ navigation }) => {
     <>
       <View>
         <ImageBackground
-          source={require("../assets/background.png")}
+          source={require("../assets/backgrounds/background.png")}
           style={styles.bg}
         >
           <Topbar />
@@ -158,7 +159,7 @@ const LoadingMatchmaking = ({ navigation }) => {
             android_disableSound={true}
           >
             <Image
-              source={require("../assets/addGame.png")}
+              source={require("../assets/buttons/addGame.png")}
               style={styles.addGameImage}
             />
           </Pressable>

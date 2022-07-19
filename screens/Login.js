@@ -5,6 +5,7 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  Text,
 } from "react-native";
 import { useContext, useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -21,7 +22,7 @@ function Login({ navigation }) {
   const [password, onChangePassword] = useState("");
   const [sound, setSound] = useState();
   const { user, setUser } = useContext(UserContext);
-  const [] = useFonts({
+  const [loaded, error] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
     InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
     PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
@@ -65,15 +66,14 @@ function Login({ navigation }) {
     <View style={styles.container}>
       <ImageBackground
         style={styles.bg}
-        source={require("./../assets/background.png")}
+        source={require("./../assets/backgrounds/background.png")}
       >
-        <Image
-          source={require("./../assets/loginBanner.png")}
-          style={styles.banner}
-        />
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>LOGIN</Text>
+        </View>
         <View style={styles.inputFieldsContainer}>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -86,7 +86,7 @@ function Login({ navigation }) {
           </ImageBackground>
 
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -122,12 +122,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   banner: {
-    resizeMode: "contain",
-    position: "absolute",
-    top: 0,
+    backgroundColor: "#DD4141",
     width: "100%",
-    height: "10%",
-    backgroundColor: "black",
+  },
+  bannerText: {
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
+    color: "white",
+    textAlign: "center",
+    paddingTop: 4,
   },
   bg: {
     width: "100%",

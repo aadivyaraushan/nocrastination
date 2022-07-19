@@ -92,7 +92,7 @@ const AddTask = ({ navigation }) => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <View style={styles.banner}>
@@ -100,7 +100,7 @@ const AddTask = ({ navigation }) => {
         </View>
         <View style={styles.inputFieldsContainer}>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -116,7 +116,7 @@ const AddTask = ({ navigation }) => {
             />
           </ImageBackground>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -132,7 +132,7 @@ const AddTask = ({ navigation }) => {
             />
           </ImageBackground>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput

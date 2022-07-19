@@ -107,10 +107,5 @@ export default function App() {
       </QuestContext.Provider>
     </UserContext.Provider>
   );
-
-  LogBox.ignoreLogs([
-    "Warning: Async Storage has been extracted from react-native core",
-  ]);
 }
-
 const styles = StyleSheet.create({});

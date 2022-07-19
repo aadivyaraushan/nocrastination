@@ -53,7 +53,7 @@ const QuestPage = ({ route, navigation }) => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <View style={styles.banner}>
@@ -61,14 +61,14 @@ const QuestPage = ({ route, navigation }) => {
         </View>
         <Topbar />
         <ImageBackground
-          source={require("../assets/mediumPanel.png")}
+          source={require("../assets/backgrounds/panels/mediumPanel.png")}
           style={styles.sectionBG}
         >
           <Text style={styles.paragraphText}>Rewards: </Text>
           {rewardsJSX}
         </ImageBackground>
         <ImageBackground
-          source={require("../assets/mediumPanel.png")}
+          source={require("../assets/backgrounds/panels/mediumPanel.png")}
           style={styles.sectionBG}
         >
           <Text style={styles.paragraphText}>Duration: </Text>
@@ -105,7 +105,7 @@ const QuestPage = ({ route, navigation }) => {
           android_disableSound={true}
         >
           <Image
-            source={require("../assets/playButton.png")}
+            source={require("../assets/buttons/playButton.png")}
             style={styles.playButton}
           />
         </Pressable>

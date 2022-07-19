@@ -9,7 +9,7 @@ import {
 import React from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import { useState } from "react/cjs/react.development";
+import { useState } from "react";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 
@@ -33,7 +33,7 @@ const BattleSelect = ({ navigation }) => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />
@@ -49,7 +49,7 @@ const BattleSelect = ({ navigation }) => {
           android_disableSound={true}
         >
           <Image
-            source={require("../assets/singleplayerButton.png")}
+            source={require("../assets/buttons/singleplayerButton.png")}
             style={styles.button}
           />
         </Pressable>
@@ -62,7 +62,7 @@ const BattleSelect = ({ navigation }) => {
           android_disableSound={true}
         >
           <Image
-            source={require("../assets/multiplayerButton.png")}
+            source={require("../assets/buttons/multiplayerButton.png")}
             style={styles.button}
           />
         </Pressable>

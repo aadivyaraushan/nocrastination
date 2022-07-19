@@ -34,7 +34,7 @@ const HealthBar = ({ health, isLower }) => {
     return (
       <View style={styles.container}>
         <Image
-          source={require("../assets/regeneration.png")}
+          source={require("../assets/icons/heart.png")}
           style={styles.heart}
         />
         <View style={styles.barsContainer}>{bars}</View>
@@ -45,7 +45,7 @@ const HealthBar = ({ health, isLower }) => {
       <View style={styles.containerUpper}>
         <View style={styles.barsContainerUpper}>{bars}</View>
         <Image
-          source={require("../assets/regeneration.png")}
+          source={require("../assets/icons/heart.png")}
           style={styles.heartUpper}
         />
       </View>

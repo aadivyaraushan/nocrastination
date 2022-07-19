@@ -88,15 +88,14 @@ function Signup({ navigation }) {
     <View style={styles.container}>
       <ImageBackground
         style={styles.bg}
-        source={require("./../assets/background.png")}
+        source={require("./../assets/backgrounds/background.png")}
       >
-        <Image
-          source={require("./../assets/signupBanner.png")}
-          style={styles.banner}
-        />
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>SIGN UP</Text>
+        </View>
         <View style={styles.inputFieldsContainer}>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -108,7 +107,7 @@ function Signup({ navigation }) {
             />
           </ImageBackground>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -120,7 +119,7 @@ function Signup({ navigation }) {
             />
           </ImageBackground>
           <ImageBackground
-            source={require("../assets/inputFieldBubble.png")}
+            source={require("../assets/backgrounds/inputFieldBubble.png")}
             style={styles.inputFieldContainer}
           >
             <TextInput
@@ -146,7 +145,7 @@ function Signup({ navigation }) {
               return (
                 <ImageBackground
                   style={styles.avatarBackground}
-                  source={require("../assets/shopPanel.png")}
+                  source={require("../assets/backgrounds/panels/shopPanel.png")}
                   key={index}
                 >
                   <Pressable
@@ -185,12 +184,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   banner: {
-    resizeMode: "contain",
-    position: "absolute",
-    top: 0,
+    backgroundColor: "#DD4141",
     width: "100%",
-    height: "10%",
-    backgroundColor: "black",
+  },
+  bannerText: {
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
+    color: "white",
+    textAlign: "center",
+    paddingTop: 4,
   },
   bg: {
     width: "100%",

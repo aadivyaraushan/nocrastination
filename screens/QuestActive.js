@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ImageBackground, Alert } from "react-native";
 import { useContext, useMemo, useState } from "react";
 import { QuestContext } from "../QuestContext";
 import { useFonts } from "expo-font";
-import { useEffect } from "react/cjs/react.development";
+import { useEffect } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { setStatusBarHidden, StatusBar } from "expo-status-bar";
 import { UserContext } from "../UserContext";
@@ -19,9 +19,9 @@ const QuestActive = ({ route, navigation }) => {
   });
 
   const potentialBackgrounds = [
-    require("../assets/activePage1.png"),
-    require("../assets/activePage2.png"),
-    require("../assets/activePage3.png"),
+    require("../assets/backgrounds/activeTaskBackgrounds/activePage1.png"),
+    require("../assets/backgrounds/activeTaskBackgrounds/activePage2.png"),
+    require("../assets/backgrounds/activeTaskBackgrounds/activePage3.png"),
   ];
   const background = useMemo(
     () =>

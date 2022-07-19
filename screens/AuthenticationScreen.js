@@ -12,11 +12,12 @@ import { useFonts } from "expo-font";
 
 function AuthenticationScreen({ navigation }) {
   const [sound, setSound] = useState();
-  const [] = useFonts({
+  const [loaded, error] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
     InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
     PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
+  console.log(loaded, error);
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -27,65 +28,77 @@ function AuthenticationScreen({ navigation }) {
     await sound.playAsync();
   }
 
-  useEffect(() => {
-    return sound
-      ? () => {
-          console.log("Unloading Sound");
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+  // useEffect(() => {
+  //   return sound
+  //     ? () => {
+  //         console.log("Unloading Sound");
+  //         sound.unloadAsync();
+  //       }
+  //     : undefined;
+  // }, [sound]);
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        style={styles.bg}
-        source={require("./../assets/background.png")}
-      >
-        <Image
-          source={require("./../assets/welcomeBanner.png")}
-          style={styles.banner}
-        />
-        <View style={styles.buttonsContainer}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("login");
-              playSound();
-            }}
-            android_disableSound={true}
-          >
-            <Image
-              source={require("./../assets/buttons/login.png")}
-              style={styles.buttons}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              navigation.navigate("signup");
-              playSound();
-            }}
-            android_disableSound={true}
-          >
-            <Image
-              source={require("./../assets/buttons/signup.png")}
-              style={styles.buttons}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              alert("Under development!");
-              playSound();
-            }}
-            android_disableSound={true}
-          >
-            <Image
-              source={require("./../assets/buttons/classcode.png")}
-              style={styles.buttons}
-            />
-          </Pressable>
-        </View>
-      </ImageBackground>
-    </View>
+    loaded && (
+      <View style={styles.container}>
+        <ImageBackground
+          style={styles.bg}
+          source={require("./../assets/backgrounds/background.png")}
+        >
+          <View style={styles.banner}>
+            <Text
+              style={{
+                fontSize: 60,
+                fontFamily: "PlayMeGames",
+                color: "white",
+                textAlign: "center",
+                paddingTop: 4,
+              }}
+            >
+              WELCOME
+            </Text>
+          </View>
+          <View style={styles.buttonsContainer}>
+            <Pressable
+              onPress={() => {
+                // playSound();
+                navigation.navigate("login");
+              }}
+              android_disableSound={true}
+            >
+              <Image
+                source={require("./../assets/buttons/login.png")}
+                style={styles.buttons}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                // playSound();
+                navigation.navigate("signup");
+              }}
+              android_disableSound={true}
+            >
+              <Image
+                source={require("./../assets/buttons/signup.png")}
+                c
+                style={styles.buttons}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                alert("Under development!");
+                playSound();
+              }}
+              android_disableSound={true}
+            >
+              <Image
+                source={require("./../assets/buttons/classcode.png")}
+                style={styles.buttons}
+              />
+            </Pressable>
+          </View>
+        </ImageBackground>
+      </View>
+    )
   );
 }
 
@@ -100,12 +113,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   banner: {
-    resizeMode: "contain",
-    position: "absolute",
-    top: 0,
+    backgroundColor: "#DD4141",
     width: "100%",
-    height: "10%",
-    backgroundColor: "black",
+  },
+  bannerText: {
+    fontSize: 60,
+    fontFamily: "PlayMeGames",
+    color: "white",
+    textAlign: "center",
+    paddingTop: 4,
   },
   bg: {
     width: "100%",

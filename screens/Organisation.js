@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { useContext } from "react/cjs/react.development";
+import { useContext } from "react";
 import { OrganisationContext } from "../OrganisationContext";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
@@ -24,7 +24,7 @@ const Organisation = () => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />
@@ -35,7 +35,7 @@ const Organisation = () => {
           <Text style={styles.bannerTextSecondary}>Members</Text>
         </View>
         <ImageBackground
-          source={require("../assets/mediumPanel.png")}
+          source={require("../assets/backgrounds/panels/mediumPanel.png")}
           style={styles.panel}
         >
           <ScrollView>
@@ -50,7 +50,7 @@ const Organisation = () => {
           <Text style={styles.bannerTextSecondary}>Requirements</Text>
         </View>
         <ImageBackground
-          source={require("../assets/mediumPanel.png")}
+          source={require("../assets/backgrounds/panels/mediumPanel.png")}
           style={styles.panel}
         >
           <Text style={styles.text}>

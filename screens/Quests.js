@@ -129,7 +129,7 @@ function Quest({ navigation }) {
                           </Text>
                         </View>
                         <Image
-                          source={require("../assets/buildingIcon.png")}
+                          source={require("../assets/icons/buildingIcon.png")}
                           style={styles.questBuilding}
                         />
                       </View>
@@ -147,14 +147,13 @@ function Quest({ navigation }) {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar style={styles.topbar} />
-        <Image
-          style={styles.banner}
-          source={require("../assets/questsBanner.png")}
-        />
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>Battle</Text>
+        </View>
         {arrOfQuestsJSX}
         <BottomBar />
       </ImageBackground>
@@ -171,11 +170,16 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   banner: {
+    marginTop: 50,
+    backgroundColor: "#DD4141",
     width: "100%",
-    resizeMode: "contain",
-    position: "absolute",
-    top: -5,
-    zIndex: 2,
+  },
+  bannerText: {
+    fontSize: 50,
+    fontFamily: "PlayMeGames",
+    color: "white",
+    textAlign: "center",
+    paddingTop: 4,
   },
   button: {
     resizeMode: "contain",
@@ -244,4 +248,3 @@ const styles = StyleSheet.create({
 });
 
 export default Quest;
-LogBox.ignoreLogs(["Setting a timer for a long period of time"]);

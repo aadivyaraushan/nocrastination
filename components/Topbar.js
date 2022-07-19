@@ -112,7 +112,7 @@ function Topbar() {
         <Image
           style={styles.icon}
           resizeMode={"contain"}
-          source={require(".././assets/ruby.png")}
+          source={require(".././assets/icons/diamond.png")}
         />
         {diamondsLocal}
       </View>
@@ -120,7 +120,7 @@ function Topbar() {
         <Image
           style={styles.icon}
           resizeMode={"contain"}
-          source={require(".././assets/coin.png")}
+          source={require(".././assets/icons/coin.png")}
         />
         {coinsLocal}
       </View>

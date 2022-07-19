@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, Image } from "react-native";
 import react from "react";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react/cjs/react.development";
+import { useState } from "react";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 
@@ -33,7 +33,7 @@ function BottomBar() {
         android_disableSound={true}
       >
         <Image
-          source={require("../assets/shopIcon.png")}
+          source={require("../assets/icons/bottomBar/shopIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
@@ -45,7 +45,7 @@ function BottomBar() {
         android_disableSound={true}
       >
         <Image
-          source={require("../assets/questsIcon.png")}
+          source={require("../assets/icons/bottomBar/questsIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
@@ -57,7 +57,7 @@ function BottomBar() {
         android_disableSound={true}
       >
         <Image
-          source={require("../assets/addTaskIcon.png")}
+          source={require("../assets/buttons/addTaskIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
@@ -69,7 +69,7 @@ function BottomBar() {
         android_disableSound={true}
       >
         <Image
-          source={require("../assets/socialIcon.png")}
+          source={require("../assets/icons/bottomBar/socialIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>
@@ -81,7 +81,7 @@ function BottomBar() {
         android_disableSound={true}
       >
         <Image
-          source={require("../assets/settingsIcon.png")}
+          source={require("../assets/icons/bottomBar/settingsIcon.png")}
           style={styles.icon}
         ></Image>
       </Pressable>

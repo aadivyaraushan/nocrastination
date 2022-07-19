@@ -18,7 +18,7 @@ import {
   query,
   QuerySnapshot,
 } from "@firebase/firestore";
-import { useContext, useEffect } from "react/cjs/react.development";
+import { useContext, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { OrganisationContext } from "../OrganisationContext";
 import { Audio } from "expo-av";
@@ -63,7 +63,7 @@ const Organisations = ({ navigation }) => {
                   android_disableSound={true}
                 >
                   <ImageBackground
-                    source={require("../assets/organisationBG.png")}
+                    source={require("../assets/backgrounds/panels/organisationBG.png")}
                     style={styles.organisationBackground}
                     key={index}
                   >
@@ -80,7 +80,7 @@ const Organisations = ({ navigation }) => {
                       {organisation["awards"]}
                     </Text>
                     <Image
-                      source={require("../assets/trophy.png")}
+                      source={require("../assets/icons/trophy.png")}
                       style={styles.organisationAwardImage}
                     />
                   </ImageBackground>
@@ -95,7 +95,7 @@ const Organisations = ({ navigation }) => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />

@@ -18,7 +18,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useContext, useEffect } from "react/cjs/react.development";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../UserContext.js";
 import { db } from "../firebase";
 import { doc, getDoc, updateDoc } from "@firebase/firestore";
@@ -87,7 +87,7 @@ const Shop = () => {
                 return (
                   <ImageBackground
                     style={styles.itemBackground}
-                    source={require("../assets/lockedBG.png")}
+                    source={require("../assets/backgrounds/lockedBG.png")}
                     key={index}
                   >
                     <Text style={styles.itemText}>
@@ -99,22 +99,22 @@ const Shop = () => {
                 let image;
                 switch (itemFromArr.data()["name"]) {
                   case "Laser Eyes":
-                    image = require("../assets/laserEyes.png");
+                    image = require("../assets/abilities/laserEyes.png");
                     break;
                   case "pyrokinesis":
-                    image = require("../assets/pyrokinesis.png");
+                    image = require("../assets/abilities/pyrokinesis.png");
                     break;
                   case "regeneration":
-                    image = require("../assets/regeneration.png");
+                    image = require("../assets/icons/heart.png");
                     break;
                   case "shield":
-                    image = require("../assets/shield.png");
+                    image = require("../assets/weapons/shield.png");
                     break;
                   case "sword":
-                    image = require("../assets/sword.png");
+                    image = require("../assets/weapons/sword.png");
                     break;
                   case "telekinesis":
-                    image = require("../assets/shopIcon.png");
+                    image = require("../assets/icons/bottomBar/shopIcon.png");
                     break;
                 }
 
@@ -142,7 +142,7 @@ const Shop = () => {
                 return (
                   <ImageBackground
                     style={styles.itemBackground}
-                    source={require("../assets/shopPanel.png")}
+                    source={require("../assets/backgrounds/panels/shopPanel.png")}
                     key={index}
                   >
                     <Pressable
@@ -224,7 +224,7 @@ const Shop = () => {
                       <Image style={styles.itemImage} source={image}></Image>
                       <Image
                         style={styles.coinIcon}
-                        source={require("../assets/coin.png")}
+                        source={require("../assets/icons/coin.png")}
                       />
                       <Text style={styles.itemFooter}>
                         {itemFromArr.data()["priceCoins"]}
@@ -259,7 +259,7 @@ const Shop = () => {
                 return (
                   <ImageBackground
                     style={styles.itemBackground}
-                    source={require("../assets/lockedBG.png")}
+                    source={require("../assets/backgrounds/lockedBG.png")}
                     key={index}
                   >
                     <Text style={styles.itemText}>
@@ -271,23 +271,23 @@ const Shop = () => {
                 let image;
                 switch (emoteFromArr.data()["name"]) {
                   case "smile":
-                    image = require("../assets/smile.png");
+                    image = require("../assets/emotes/smile.png");
                     break;
                   case "embarrased":
-                    image = require("../assets/embarrased.png");
+                    image = require("../assets/emotes/embarrased.png");
                     break;
                   case "ROFL":
-                    image = require("../assets/rofl.png");
+                    image = require("../assets/emotes/rofl.png");
                     break;
                   case "surprise":
-                    image = require("../assets/surprise.png");
+                    image = require("../assets/emotes/surprise.png");
                     break;
                 }
 
                 return (
                   <ImageBackground
                     style={styles.itemBackground}
-                    source={require("../assets/shopPanel.png")}
+                    source={require("../assets/backgrounds/panels/shopPanel.png")}
                     key={index}
                   >
                     <Pressable
@@ -369,7 +369,7 @@ const Shop = () => {
                       </Text>
                       <Image
                         style={styles.rubyIcon}
-                        source={require("../assets/ruby.png")}
+                        source={require("../assets/icons/diamond.png")}
                       />
                     </Pressable>
                   </ImageBackground>
@@ -383,7 +383,7 @@ const Shop = () => {
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1 }}>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />

@@ -9,7 +9,7 @@ import {
 import React from "react";
 import Topbar from "../components/Topbar";
 import BottomBar from "../components/BottomBar";
-import { useContext, useEffect, useState } from "react/cjs/react.development";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../UserContext";
 import { QuestContext } from "../QuestContext";
 import { doc, getDoc, updateDoc } from "@firebase/firestore";
@@ -45,7 +45,7 @@ const PickATask = ({ navigation }) => {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />

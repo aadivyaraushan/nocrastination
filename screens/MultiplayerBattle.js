@@ -5,9 +5,11 @@ import {
   ImageBackground,
   Image,
   Pressable,
+  ScrollView,
+  Animated,
 } from "react-native";
 import React, { useEffect } from "react";
-import { useContext, useState } from "react/cjs/react.development";
+import { useContext, useRef, useState } from "react";
 import { QuestContext } from "../QuestContext";
 import { GameContext } from "../GameContext";
 import HealthBar from "../components/HealthBar";
@@ -17,7 +19,15 @@ import { deleteDoc, doc, updateDoc } from "@firebase/firestore";
 import { db, rtdb } from "../firebase";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
-import { child, get, onValue, ref, remove, update } from "firebase/database";
+import {
+  child,
+  get,
+  onValue,
+  ref,
+  remove,
+  set,
+  update,
+} from "firebase/database";
 
 const MultiplayerBattle = ({ route, navigation }) => {
   // Declaration of necessary context
@@ -77,7 +87,29 @@ const MultiplayerBattle = ({ route, navigation }) => {
       currentXp: user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
     })
       .then(() => {
-        console.log("Document updated");
+        console.log("User document updated");
+        // remove quest if subTasks is empty, otherwise update quest subTasks
+        console.log(subTasks);
+        if (subTasks === [] || subTasks === null || subTasks === undefined) {
+          console.log("if called");
+          console.log("User tasks: ", user["tasks"]);
+          console.log("Task index: ", user["tasks"].indexOf(quest["title"]));
+          user["tasks"].splice(user["tasks"].indexOf(quest["title"]), 1);
+          console.log("New Tasks: ", user["tasks"]);
+          updateDoc(doc(db, "users", user["email"]), {
+            tasks: user["tasks"],
+          }).then(() => {
+            deleteDoc(doc(db, "tasks", quest["title"]));
+          });
+        } else {
+          console.log("else called");
+          updateDoc(doc(db, "tasks", quest["title"]), {
+            subTasks: subTasks,
+          });
+        }
+      })
+      .then(() => {
+        console.log("Updated quest-related documents");
         setUser({
           activeQuest: user["activeQuest"],
           avatar: user["avatar"],
@@ -96,13 +128,27 @@ const MultiplayerBattle = ({ route, navigation }) => {
       })
       .then(() => {
         console.log("User context updated");
+      })
+      .then(() => {
+        console.log("Game removed");
         navigation.navigate("homepage");
+      })
+      .then(() => {
+        updateDoc(doc(db, "tasks", quest["title"]), {
+          subTasks: subTasks,
+        }).then(() => {
+          remove(ref(rtdb, `games/${game}`));
+        });
       });
   }
 
   function playerLose() {
     alert("You lost!");
-    navigation.navigate("homepage");
+    updateDoc(doc(db, "tasks", quest["title"]), {
+      subTasks: subTasks,
+    }).then(() => {
+      navigation.navigate("homepage");
+    });
   }
 
   // Declaring isPlayerOne
@@ -120,6 +166,28 @@ const MultiplayerBattle = ({ route, navigation }) => {
   });
 
   // Declaring state
+  const [emotePressed, setEmotePressed] = useState("");
+  // const [player1Emote, setPlayer1Emote] = useState(
+  //   <Animated.Image
+  //     style={[
+  //       styles.emoteAnimation,
+  //       {
+  //         transform: player1EmoteAnim,
+  //       },
+  //     ]}
+  //   />
+  // );
+  // const [player2Emote, setPlayer2Emote] = useState(
+  //   <Animated.Image
+  //     style={[
+  //       styles.emoteAnimation,
+  //       {
+  //         transform: player2EmoteAnim,
+  //       },
+  //     ]}
+  //   />
+  // );
+  const [emotesJSX, setEmotesJSX] = useState(<></>);
   const [subTasks, setSubTasks] = useState([]);
   const [health1, setHealth1] = useState();
   const [health2, setHealth2] = useState();
@@ -147,29 +215,29 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
     // Getting subTasks one time
     get(child(ref(rtdb), `games/${game}/subTasks`)).then((snapshot) => {
-      if (isPlayerOne) setSubTasks(snapshot.val()["player1"]);
-      else setSubTasks(snapshot.val()["player2"]);
-      console.log("Extracted subTasks");
-      // Attaching listener to subTasks
-      onValue(ref(rtdb, `games/${game}/subTasks`), (snapshot) => {
+      if (snapshot.exists()) {
         if (isPlayerOne) setSubTasks(snapshot.val()["player1"]);
         else setSubTasks(snapshot.val()["player2"]);
+        console.log("Extracted subTasks");
+      }
+
+      // Attaching listener to subTasks
+      onValue(ref(rtdb, `games/${game}/subTasks`), (snapshot) => {
+        if (snapshot.exists()) {
+          console.log("subTasks listener called");
+          const subTasksTemp = isPlayerOne
+            ? snapshot.val()["player1"]
+            : snapshot.val()["player2"];
+          console.log("subTasksTemp: ", subTasksTemp);
+          // if (isPlayerOne) setSubTasks(snapshot.val()["player1"]);
+          // else setSubTasks(snapshot.val()["player2"]);
+          setSubTasks(subTasksTemp);
+        }
       });
     });
     // Getting healths one time
     get(child(ref(rtdb), `games/${game}/healths`)).then((snapshot) => {
-      const one = snapshot.val()["player1"];
-      const two = snapshot.val()["player2"];
-      if (isPlayerOne) {
-        setHealth1(one);
-        setHealth2(two);
-      } else {
-        setHealth1(two);
-        setHealth2(one);
-      }
-      console.log("Extracted healths");
-      // Attaching listener to healths
-      onValue(ref(rtdb, `games/${game}/healths`), (snapshot) => {
+      if (snapshot.exists()) {
         const one = snapshot.val()["player1"];
         const two = snapshot.val()["player2"];
         if (isPlayerOne) {
@@ -178,6 +246,23 @@ const MultiplayerBattle = ({ route, navigation }) => {
         } else {
           setHealth1(two);
           setHealth2(one);
+        }
+        console.log("Extracted healths");
+      }
+
+      // Attaching listener to healths
+      onValue(ref(rtdb, `games/${game}/healths`), (snapshot) => {
+        console.log("Health listener called");
+        if (snapshot.exists()) {
+          const one = snapshot.val()["player1"];
+          const two = snapshot.val()["player2"];
+          if (isPlayerOne) {
+            setHealth1(one);
+            setHealth2(two);
+          } else {
+            setHealth1(two);
+            setHealth2(one);
+          }
         }
       });
     });
@@ -237,6 +322,41 @@ const MultiplayerBattle = ({ route, navigation }) => {
     });
 
     console.log("Attached listeners for subTasks and healths");
+
+    // Listener for emotes
+    onValue(ref(rtdb, `games/${game}/emote`), (snapshot) => {
+      if (snapshot.exists()) {
+        console.log("Emote used: ", snapshot);
+        if (snapshot.val()["byPlayerOne"]) {
+          if (isPlayerOne) {
+            // show animation for player one on left side
+            console.log(
+              "Emote used by player one -  showing animation on left side"
+            );
+          } else {
+            // show animation for player one on right side
+            console.log(
+              "Emote used by player one -  showing animation on right side"
+            );
+          }
+        } else {
+          // animation was used by player 2
+          if (isPlayerOne) {
+            // show animation for player two on right side
+            console.log(
+              "Emote used by player two -  showing animation on right side"
+            );
+          } else {
+            // show animation for player two on left side
+            console.log(
+              "Emote used by player two -  showing animation on left side"
+            );
+          }
+        }
+      } else {
+        console.log("Emote snapshot doesn't exist");
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -251,9 +371,11 @@ const MultiplayerBattle = ({ route, navigation }) => {
   }, [health1, health2]);
 
   useEffect(() => {
-    console.log(health2);
-    if (isPlayerOne && health2) {
-      if (subTasks) {
+    console.log("Use effect for subTasks called, new subTasks: ", subTasks);
+    if ((isPlayerOne && health2 > 0) || (!isPlayerOne && health1 > 0)) {
+      console.log("Condition 1 satisfied");
+      if (subTasks != null) {
+        console.log("Condition 2 satisfied");
         setSubTasks1(
           <>
             {subTasks.map((subTask, index) => {
@@ -267,22 +389,33 @@ const MultiplayerBattle = ({ route, navigation }) => {
                       if (health2) {
                         let subTasksTemp = subTasks;
                         subTasksTemp.splice(subTasksTemp.indexOf(subTask), 1);
+                        console.log(
+                          "subTasksTemp(in subTasks1 JSX): ",
+                          subTasksTemp
+                        );
                         const updates = {};
-                        updates[`games/${game}/subTasks/player1`] =
-                          subTasksTemp;
-                        updates[`games/${game}/healths/player2`] =
-                          health2 - damage;
+                        if (isPlayerOne) {
+                          updates[`games/${game}/subTasks/player1`] =
+                            subTasksTemp;
+                          updates[`games/${game}/healths/player2`] =
+                            health2 - damage;
+                        } else {
+                          updates[`games/${game}/subTasks/player2`] =
+                            subTasksTemp;
+                          updates[`games/${game}/healths/player1`] =
+                            health2 - damage;
+                        }
+
                         update(ref(rtdb), updates).then(() => {
                           setAttackPressed(true);
                           playAttack();
-                          // setHealth2(health2 - damage);
+                          // setSubTasks(subTasksTemp);
                         });
                       }
                     }
                   }}
                   key={index}
                   style={styles.textContainer}
-                  disabled={!isPlayerOne}
                   android_disableSound={true}
                 >
                   <Text style={styles.text} key={index}>
@@ -295,60 +428,110 @@ const MultiplayerBattle = ({ route, navigation }) => {
         );
       }
       setSubTasks2(<Text style={styles.text}>...</Text>);
-    } else if (health2) {
-      console.log(health2);
-      if (subTasks) {
-        setSubTasks2(
-          <>
-            {subTasks.map((subTask, index) => {
-              return (
-                <Pressable
-                  onPress={() => {
-                    console.log("Pressed");
-                    if (count < 60) {
-                      alert("Wait 1 min before checking off another sub-quest");
-                    } else {
-                      let subTasksTemp = subTasks;
-                      subTasksTemp.splice(subTasksTemp.indexOf(subTask), 1);
-                      const updates = {};
-                      updates[`games/${game}/subTasks/player2`] = subTasksTemp;
-                      console.log("Health2: " + health2);
-                      console.log("Damage: " + damage);
-                      updates[`games/${game}/healths/player1`] =
-                        health2 - damage;
-                      // console.log(updates);
+      // } else {
+      //   // console.log(health2);
+      //   if (subTasks) {
+      //     setSubTasks1(
+      //       <>
+      //         {subTasks.map((subTask, index) => {
+      //           return (
+      //             <Pressable
+      //               onPress={() => {
+      //                 console.log("Pressed");
+      //                 if (count < 60) {
+      //                   alert("Wait 1 min before checking off another sub-quest");
+      //                 } else {
+      //                   let subTasksTemp = subTasks;
+      //                   subTasksTemp.splice(subTasksTemp.indexOf(subTask), 1);
+      //                   const updates = {};
+      //                   updates[`games/${game}/subTasks/player2`] = subTasksTemp;
+      //                   console.log("Health2: " + health2);
+      //                   console.log("Damage: " + damage);
+      //                   updates[`games/${game}/healths/player1`] =
+      //                     health2 - damage;
+      //                   // console.log(updates);
 
-                      update(ref(rtdb), updates).then(() => {
-                        setAttackPressed(true);
-                        playAttack();
-                        // setHealth1(health1 - damage);
-                      });
-                    }
-                  }}
-                  key={index}
-                  style={styles.textContainer}
-                  disabled={isPlayerOne}
-                  android_disableSound={true}
-                >
-                  <Text style={styles.text} key={index}>
-                    □{subTask}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </>
-        );
-      }
-      setSubTasks1(<Text style={styles.text}>...</Text>);
+      //                   update(ref(rtdb), updates).then(() => {
+      //                     setAttackPressed(true);
+      //                     playAttack();
+      //                     // setHealth1(health1 - damage);
+      //                   });
+      //                 }
+      //               }}
+      //               key={index}
+      //               style={styles.textContainer}
+      //               disabled={isPlayerOne}
+      //               android_disableSound={true}
+      //             >
+      //               <Text style={styles.text} key={index}>
+      //                 □{subTask}
+      //               </Text>
+      //             </Pressable>
+      //           );
+      //         })}
+      //       </>
+      //     );
+      //   }
+      //   setSubTasks2(<Text style={styles.text}>...</Text>);
     }
-  }, [subTasks]);
+  }, [subTasks, health2]);
+
+  useEffect(() => {
+    const arrJSX = [];
+    user["emotes"].map((emoteName, index) => {
+      let emote;
+      switch (emoteName) {
+        case "embarrased":
+          emote = require("../assets/emotes/embarrased.png");
+          break;
+        case "rofl":
+          emote = require("../assets/emotes/rofl.png");
+          break;
+        case "smile":
+          emote = require("../assets/emotes/smile.png");
+          break;
+        case "surprise":
+          emote = require("../assets/emotes/surprise.png");
+          break;
+      }
+      arrJSX.push(
+        <Pressable
+          key={index}
+          onPress={() => setEmotePressed(emoteName)}
+          // disabled={!(health2 <= 0 || health1 <= 0)}
+        >
+          <Image key={index} source={emote} style={styles.emote} />
+        </Pressable>
+      );
+    });
+    setEmotesJSX(
+      <>
+        <View style={styles.emoteContainer}>
+          <ScrollView horizontal={true}>{arrJSX}</ScrollView>
+        </View>
+      </>
+    );
+  }, []);
+
+  useEffect(() => {
+    if (emotePressed != "") {
+      console.log("Pressed emote: " + emotePressed);
+      set(ref(rtdb, `games/${game}/emote`), {
+        emotePressed,
+        byPlayerOne: isPlayerOne,
+      }).then(() => {
+        console.log("set emote in database");
+      });
+    }
+  }, [emotePressed]);
 
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
+        {/* {emotesJSX} */}
         <View style={styles.panelsContainer}>
           <ImageBackground style={styles.subTasksPanel}>
             <View style={styles.subTasksContainer}>
@@ -364,8 +547,10 @@ const MultiplayerBattle = ({ route, navigation }) => {
           </ImageBackground>
         </View>
         {upperHealthBar}
-        <Image style={styles.lowerAvatar} source={player1Avatar} />
         <Image style={styles.upperAvatar} source={player2Avatar} />
+        {/* {player2Emote} */}
+        <Image style={styles.lowerAvatar} source={player1Avatar} />
+        {/* {player1Emote} */}
         {lowerHealthBar}
       </ImageBackground>
     </View>
@@ -385,7 +570,7 @@ const styles = StyleSheet.create({
   subTasksPanel: {
     backgroundColor: "#9EDBD8",
     width: 200,
-    height: 250,
+    height: 175,
   },
   subTasksContainer: {
     display: "flex",
@@ -409,16 +594,11 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     flexWrap: "nowrap",
-    // marginLeft: 30,
-    // marginTop: 5,
-    // marginBottom: 5,
   },
   name: {
     fontSize: 30,
     color: "white",
     fontFamily: "PlayMeGames",
-    // marginLeft: 30,
-    // marginTop: 5,
     marginBottom: 10,
     textDecorationStyle: "solid",
     textDecorationLine: "underline",
@@ -427,16 +607,31 @@ const styles = StyleSheet.create({
     width: 170,
     height: 170,
     marginLeft: 10,
-    marginBottom: 40,
+    marginBottom: 100,
     resizeMode: "contain",
     transform: [{ scaleX: -1 }],
+    bottom: "30%",
   },
   upperAvatar: {
     width: 170,
     height: 170,
-    position: "absolute",
-    top: 80,
-    right: 20,
+    // position: "absolute",
+    top: "30%",
+    left: "60%",
     resizeMode: "contain",
+  },
+  emote: {
+    resizeMode: "contain",
+    marginRight: 40,
+  },
+  emoteContainer: {
+    backgroundColor: "#0d0d0d",
+    width: "100%",
+    height: 75,
+    bottom: 0,
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
 });

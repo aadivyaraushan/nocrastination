@@ -103,6 +103,7 @@ const AddGame = ({ navigation }) => {
         player1: user["email"],
         player2: "",
       },
+      emote: {},
     })
       .then(() => {
         setBodyJSX(
@@ -113,7 +114,7 @@ const AddGame = ({ navigation }) => {
         );
 
         onValue(ref(rtdb, `games/${id}/names/player2`), (snapshot) => {
-          if (snapshot.val() != "") {
+          if (snapshot.val() != "" && snapshot.val() != null) {
             setBodyJSX(
               <View style={styles.container}>
                 <Text style={styles.text}>Player found!</Text>
@@ -131,15 +132,22 @@ const AddGame = ({ navigation }) => {
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
       e.preventDefault();
-      // deleteDoc(doc(db, "games", String(id)));
-      remove(ref(rtdb, `games/${id}`));
+      remove(ref(rtdb, `games/${id}`))
+        .then(() => {
+          console.log("Removed item");
+          navigation.dispatch(e.data.action);
+        })
+        .then(() => {
+          console.log("Dispatched original action");
+        })
+        .catch((error) => console.log(error));
     });
   }, [navigation]);
 
   return (
     <View>
       <ImageBackground
-        source={require("../assets/background.png")}
+        source={require("../assets/backgrounds/background.png")}
         style={styles.bg}
       >
         <Topbar />
