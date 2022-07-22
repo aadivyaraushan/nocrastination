@@ -6,7 +6,7 @@ import {
   Image,
   Pressable,
   ScrollView,
-  Animated,
+  Animated, Alert,
 } from "react-native";
 import React, { useEffect } from "react";
 import { useContext, useRef, useState } from "react";
@@ -40,6 +40,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
   const [count, setCount] = useState(80);
   const [attackPressed, setAttackPressed] = useState(false);
   const [sound, setSound] = useState();
+  const [isGameOver, setIsGameOver] = useState(false);
   const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
     InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
@@ -81,6 +82,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
   function playerWin() {
     alert("You won!");
+    setIsGameOver(true)
     playVictory();
     updateDoc(doc(db, "users", user["email"]), {
       coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
@@ -144,6 +146,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
   function playerLose() {
     alert("You lost!");
+    setIsGameOver(true);
     updateDoc(doc(db, "tasks", quest["title"]), {
       subTasks: subTasks,
     }).then(() => {
@@ -151,7 +154,19 @@ const MultiplayerBattle = ({ route, navigation }) => {
     });
   }
 
-  // Declaring isPlayerOne
+  // Preventing user from exiting the game
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+      if (!isGameOver) {
+        Alert.alert("You cannot leave until the quest is complete!", "", [{ text: "OK" , onPress: () => {}}]);
+      }
+      if(isGameOver)
+      {
+        navigation.dispatch(e.data.action);
+      }
+    });
+  }, [navigation, isGameOver]);
 
   // Declaring damage for player
   let damage = 0;

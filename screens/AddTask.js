@@ -58,33 +58,34 @@ const AddTask = ({ navigation }) => {
       title: title,
       subTasks: subTasksArr,
       difficulty: difficulty,
-      owner: user["email"],
+      owner: user.email,
     };
 
     await setDoc(doc(db, "tasks", title), data).then(() =>
       console.log("setDoc for setting task")
     );
-    user["tasks"].unshift(data["title"]);
+    user["tasks"].unshift(data.title);
     setUser({
-      activeQuest: user["activeQuest"],
-      coins: user["coins"],
-      emotes: user["emotes"],
-      items: user["items"],
-      currentXp: user["currentXp"],
-      diamonds: user["diamonds"],
-      displayName: user["displayName"],
-      email: user["email"],
-      level: user["level"],
-      multiplier: user["multiplier"],
-      questsDone: user["questsDone"],
-      tasks: user["tasks"],
-      avatar: user["avatar"],
+      activeQuest: user.activeQuest,
+      coins: user.coins,
+      emotes: user.emotes,
+      items: user.items,
+      currentXp: user.currentXp,
+      diamonds: user.diamonds,
+      displayName: user.displayName,
+      email: user.email,
+      level: user.level,
+      multiplier: user.multiplier,
+      questsDone: user.questsDone,
+      tasks: user.tasks,
+      avatar: user.avatar,
     });
 
-    const userRef = doc(db, "users", user["email"]);
+    const userRef = doc(db, "users", user.email);
     await updateDoc(userRef, {
-      tasks: user["tasks"],
+      tasks: user.tasks,
     }).then(() => console.log("updateDoc for adding task"));
+
     playSubmit();
     navigation.goBack();
   };

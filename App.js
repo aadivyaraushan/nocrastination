@@ -47,16 +47,16 @@ export default function App() {
 
   const rewardData = {
     easy: {
-      coins: 5,
-      xp: 10,
+      coins: 8,
+      xp: 15,
     },
     medium: {
-      coins: 10,
-      xp: 20,
+      coins: 15,
+      xp: 30,
     },
     hard: {
-      coins: 20,
-      xp: 40,
+      coins: 30,
+      xp: 60,
     },
   };
 

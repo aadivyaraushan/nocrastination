@@ -74,7 +74,7 @@ const QuestPage = ({ route, navigation }) => {
           <Text style={styles.paragraphText}>Duration: </Text>
           <MultiSlider
             sliderLength={250}
-            min={0}
+            min={1}
             max={95}
             step={5}
             onValuesChange={(values) => {
