@@ -38,7 +38,7 @@ const PickATask = ({ navigation }) => {
   const pressHandler = async (taskTitle) => {
     await playSelect();
     const docSnap = await getDoc(doc(db, "tasks", taskTitle));
-    await setQuest(docSnap.data());
+    await setQuest(docSnap.data())
     await navigation.navigate("matchmakingSelect");
   };
 

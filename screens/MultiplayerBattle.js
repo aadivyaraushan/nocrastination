@@ -47,6 +47,27 @@ const MultiplayerBattle = ({ route, navigation }) => {
     PlayMeGames: require("../assets/fonts/Playmegames-Regular.ttf"),
   });
 
+  // Multipliers
+  const [multiplierXP, setMultiplierXP] = useState(1);
+  const [multiplierCoins, setMultiplierCoins] = useState(1);
+
+  useEffect(() => {
+    user.items.map((item) => {
+      console.log(item);
+      const updateMultipliers = async () => {
+        const docSnap = await getDoc(doc(db, "shop", item));
+        if(docSnap.exists()) {
+          setMultiplierCoins((multiplierCoins) => multiplierCoins * docSnap.data().multiplierCoins);
+          setMultiplierXP((multiplierXP) => multiplierXP * docSnap.data().multiplierXP);
+        }
+        else {
+          console.log("item not found");
+        }
+      }
+      updateMultipliers();
+    });
+  }, []);
+
   // Sound functions
   async function playDamaged() {
     const { sound } = await Audio.Sound.createAsync(
@@ -82,11 +103,11 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
   function playerWin() {
     alert("You won!");
-    setIsGameOver(true)
     playVictory();
+
     updateDoc(doc(db, "users", user["email"]), {
-      coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
-      currentXp: user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
+      coins: user["coins"] + (multiplierCoins*rewardData[quest["difficulty"]]["coins"]),
+      currentXp: user["currentXp"] + (multiplierXP*rewardData[quest["difficulty"]]["xp"]),
     })
       .then(() => {
         console.log("User document updated");
@@ -133,14 +154,14 @@ const MultiplayerBattle = ({ route, navigation }) => {
       })
       .then(() => {
         console.log("Game removed");
-        navigation.navigate("homepage");
+        setIsGameOver(true)
       })
       .then(() => {
-        updateDoc(doc(db, "tasks", quest["title"]), {
-          subTasks: subTasks,
-        }).then(() => {
-          remove(ref(rtdb, `games/${game}`));
-        });
+        setQuest(null);
+        remove(ref(rtdb, `games/${game}`)).then(() => setGame(null));
+      })
+      .then(() => {
+        navigation.navigate("homepage");
       });
   }
 
@@ -161,7 +182,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
       if (!isGameOver) {
         Alert.alert("You cannot leave until the quest is complete!", "", [{ text: "OK" , onPress: () => {}}]);
       }
-      if(isGameOver)
+      else if(isGameOver)
       {
         navigation.dispatch(e.data.action);
       }

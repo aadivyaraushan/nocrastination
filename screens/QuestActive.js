@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { setStatusBarHidden, StatusBar } from "expo-status-bar";
 import { UserContext } from "../UserContext";
-import {doc, updateDoc, getFirestore, deleteDoc} from "firebase/firestore";
+import { getDoc, doc, updateDoc, deleteDoc} from "firebase/firestore";
+import { db } from "../firebase";
 
 const QuestActive = ({ route, navigation }) => {
   const rewardData = route.params;
   const { user, setUser } = useContext(UserContext);
-  const db = getFirestore();
   const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
     InkyThinPixels: require("../assets/fonts/InkyThinPixels-Regular.ttf"),
@@ -38,19 +38,32 @@ const QuestActive = ({ route, navigation }) => {
   const [loaded] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
   });
+  const [multiplierXP, setMultiplierXP] = useState(1);
+  const [multiplierCoins, setMultiplierCoins] = useState(1);
 
   useEffect(() => {
-    // const timeout = setTimeout(() => {
-    //   setTime(time - 1);
-    // }, 1000);
     setInterval(() => {
         setTime((time) => time - 1);
     }, 1000);
-    // return () => {
-    //   // alert("DONE!");
-    //   clearTimeout(timeout);
-    // };
+    user.items.map((item) => {
+      console.log(item);
+      const updateMultipliers = async () => {
+        const docSnap = await getDoc(doc(db, "shop", item));
+        if(docSnap.exists()) {
+          setMultiplierCoins((multiplierCoins) => multiplierCoins * docSnap.data().multiplierCoins);
+          setMultiplierXP((multiplierXP) => multiplierXP * docSnap.data().multiplierXP);
+        }
+        else {
+          console.log("item not found");
+        }
+      }
+      updateMultipliers();
+    });
   }, []);
+
+  useEffect(() => {
+    console.log("multiplier XP and coins(respectively): ", multiplierXP, multiplierCoins);
+  }, [multiplierXP, multiplierCoins]);
 
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
@@ -74,13 +87,16 @@ const QuestActive = ({ route, navigation }) => {
           text: "Yes",
           onPress: () => {
             Alert.alert("Quest completed! You will now receive the rewards.");
+            const prevCoins = user.coins;
+            const prevXP = user.currentXp;
+            console.log(prevCoins, prevXP)
             setIsGameOver(true);
             const tasks = user.tasks;
             tasks.splice(tasks.indexOf(quest.title), 1);
             setUser({
-              coins: user.coins + rewardData[quest.difficulty].coins,
+              coins: user.coins + (multiplierCoins*rewardData[quest.difficulty].coins),
               currentXp:
-                  user.currentXp + rewardData[quest.difficulty].xp,
+                  user.currentXp + (multiplierXP*rewardData[quest.difficulty].xp),
               diamonds: user.diamonds,
               displayName: user.displayName,
               email: user.email,
@@ -94,17 +110,17 @@ const QuestActive = ({ route, navigation }) => {
               tasks: user.tasks,
             });
             console.log("user context updated");
-            navigation.navigate("homepage");
             updateDoc(doc(db, "users", user.email), {
-              coins: user.coins + rewardData[quest.difficulty].coins,
+              coins: prevCoins + (multiplierCoins*rewardData[quest.difficulty].coins),
               currentXp:
-                  user.currentXp + rewardData[quest.difficulty].xp,
+                  prevXP + (multiplierXP*rewardData[quest.difficulty].xp),
               tasks: user.tasks,
             }).then(() => {
               console.log("updateDoc for quest rewards");
               deleteDoc(doc(db, "tasks", quest.title));
             }).then(() => {
               console.log("deleteDoc for quest");
+              navigation.navigate("homepage");
             });
           },
         },

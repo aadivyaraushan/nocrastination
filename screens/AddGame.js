@@ -23,6 +23,8 @@ const AddGame = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { game, setGame } = useContext(GameContext);
   const { quest, setQuest } = useContext(QuestContext);
+  const [playerOneHealth, setPlayerOneHealth] = useState(100);
+  const [playerOneDamage, setPlayerOneDamage] = useState(0);
 
   const [] = useFonts({
     RetroGaming: require("../assets/fonts/RetroGaming-Regular.ttf"),
@@ -38,41 +40,36 @@ const AddGame = ({ navigation }) => {
   );
 
   useEffect(() => {
-    let player1HealthBoost = 0;
-    let player1DamageBoost = 0;
-    let player1Avatar = "";
-
-    let items = [];
     for (let itemName of user["items"]) {
       console.log(itemName);
       getDoc(doc(db, "shop", itemName)).then((docSnap) => {
-        if (docSnap.exists()) items.push(docSnap.data());
-      });
+        if (docSnap.exists()) {
+          console.log("docSnap exists")
+          // items.push(docSnap.data())
+          let item = docSnap.data();
+          if (item["name"] == "regeneration") {
+            // special regeneration stuff
+          } else if (item["type"] == "offensive")
+            setPlayerOneDamage(playerOneDamage => playerOneDamage += item["damageBoost"]);
+          else if (item["type"] == "defensive")
+            setPlayerOneHealth(playerOneHealth => playerOneHealth += item["healthBoost"]);
+        } else {
+          console.log("docSnap does not exist")
+        }
+      })
     }
+  }, []);
 
-    // boost calculations
-    for (const item of items) {
-      if (item["name"] == "regeneration") {
-        // special regeneration stuff
-      } else if (item["type"] == "offensive")
-        player1DamageBoost += item["damageBoost"];
-      else if (item["type"] == "deensive")
-        player1HealthBoost += item["healthBoost"];
-    }
-    // damage calculation
-    const player1Damage = 100 / quest["subTasks"].length + player1DamageBoost;
-
-    // health calculation
-    let player1Health = 100 + player1HealthBoost;
-
-    // creating game
+  useEffect(() => {
+    setGame(id);
+    console.log(playerOneHealth, playerOneDamage)
     set(ref(rtdb, `games/${id}`), {
       names: {
         player1: user["displayName"],
         player2: "",
       },
       healths: {
-        player1: player1Health,
+        player1: playerOneHealth,
         player2: 0,
       },
       subTasks: {
@@ -96,7 +93,7 @@ const AddGame = ({ navigation }) => {
         player2: "",
       },
       damages: {
-        player1: player1Damage,
+        player1: playerOneDamage,
         player2: 0,
       },
       emails: {
@@ -105,29 +102,30 @@ const AddGame = ({ navigation }) => {
       },
       emote: {},
     })
-      .then(() => {
-        setBodyJSX(
-          <View style={styles.container}>
-            <Text style={styles.text}>Waiting for a player to join</Text>
-            <ActivityIndicator color="#ffff" size="large" />
-          </View>
-        );
-
-        onValue(ref(rtdb, `games/${id}/names/player2`), (snapshot) => {
-          if (snapshot.val() != "" && snapshot.val() != null) {
-            setBodyJSX(
+        .then(() => {
+          setBodyJSX(
               <View style={styles.container}>
-                <Text style={styles.text}>Player found!</Text>
+                <Text style={styles.text}>Waiting for a player to join</Text>
+                <ActivityIndicator color="#ffff" size="large" />
               </View>
-            );
-            navigation.navigate("multiplayerBattle");
-          }
+          );
+
+          onValue(ref(rtdb, `games/${id}/names/player2`), (snapshot) => {
+            if (snapshot.val() != "" && snapshot.val() != null) {
+              setPlayerOneDamage(playerOneDamage => playerOneDamage+(snapshot.val().healths.player2)/(snapshot.val().subTasks.player1.length));
+              setBodyJSX(
+                  <View style={styles.container}>
+                    <Text style={styles.text}>Player found!</Text>
+                  </View>
+              );
+              navigation.navigate("multiplayerBattle");
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
         });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  }, [playerOneHealth, playerOneDamage]);
 
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {

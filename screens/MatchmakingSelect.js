@@ -19,12 +19,14 @@ import { GameContext } from "../GameContext";
 import { QuestContext } from "../QuestContext";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, getDocs, collection, query, where, } from "firebase/firestore";
 
 const LoadingMatchmaking = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { game, setGame } = useContext(GameContext);
   const { quest, setQuest } = useContext(QuestContext);
+  const [health, setHealth] = useState(100);
+  const [damage, setDamage] = useState(0);
   const [gamesJSX, setGamesJSX] = useState(<></>);
   const games = [];
   const [sound, setSound] = useState();
@@ -48,52 +50,95 @@ const LoadingMatchmaking = ({ navigation }) => {
     await sound.playAsync();
   }
 
-  const pressHandler = (game, id) => {
+  const pressHandler = async (game, id) => {
     console.log("pressHandler triggered");
+    setGame(id);
+    let damageTemp = 0;
+    let healthTemp = 100;
+    const items = [];
+    // for (let itemName of user["items"]) {
+    //   console.log(itemName);
+    //   getDoc(doc(db, "shop", itemName)).then((docSnap) => {
+    //     // if (docSnap.exists()) {
+    //     //   console.log("docSnap exists");
+    //     //   let item = docSnap.data();
+    //     //   if (item.type === "regeneration") {
+    //     //     // special regeneration stuff
+    //     //   } else if (item.type === "offensive") {
+    //     //     // setDamage(damage => damage + item.damageBoost);
+    //     //     damageTemp += item.damageBoost;
+    //     //   } else if (item.type === "defensive") {
+    //     //     // setHealth(health => health + item.healthBoost)
+    //     //     healthTemp += item.healthBoost;
+    //     //   }
+    //     items.push(docSnap.data());
+    //   })
+    // };
 
-    let healthBoost = 0;
-    let damageBoost = 0;
+    // 1. Get every document of the shops collection and append to the items array
+    // 2. Loop through the items array and run the commented out logic for each item
+    const querySnapshot = await getDocs(query(collection(db, "shop"), where("a", "==", "1")));
+    await querySnapshot.forEach(doc => {
+      items.push(doc.data());
+    });
+    await console.log(items);
+    for (let item of items) {
+          if (item.type === "regeneration") {
+            // special regeneration stuff
+            console.log('regeneration')
+          } else if (item.type === "offensive") {
+            // setDamage(damage => damage + item.damageBoost);
+            console.log("offensive item")
+            damageTemp += item.damageBoost;
+            console.log(damageTemp);
+          } else if (item.type === "defensive") {
+            // setHealth(health => health + item.healthBoost)
+            console.log("defensive item")
+            healthTemp += item.healthBoost;
+            console.log(healthTemp);
+          }
+    };
+    await console.log(healthTemp, damageTemp);
+    setHealth(healthTemp);
+    setDamage(damageTemp);
 
-    let items = [];
-    for (let itemName of user["items"]) {
-      console.log(itemName);
-      getDoc(doc(db, "shop", itemName)).then((docSnap) => {
-        if (docSnap.exists()) items.push(docSnap.data());
+    // navigation.navigate("multiplayerBattle");
+  }
+
+  useEffect(() => {
+    console.log(health, damage, game)
+    const updates = {};
+    if(health != 100 && damage != 0 && game){
+      let addedDamage = 0;
+      console.log(typeof game)
+      get(child(ref(rtdb), `/games/${game}`)).then((snapshot) => {
+        if(snapshot.exists()) {
+          // addedDamage = snapshot.val().healths.player1/snapshot.val().subTasks.player1.length;
+          console.log(snapshot.val());
+        }
+
+      });
+
+      updates[`/games/${game}/avatars/player2`] = user["avatar"];
+      updates[`/games/${game}/difficulty/player2`] = quest["difficulty"];
+      updates[`/games/${game}/healths/player2`] = health;
+      updates[`/games/${game}/damages/player2`] = damage + addedDamage;
+      updates[`/games/${game}/levels/player2`] = user["level"];
+      updates[`/games/${game}/names/player2`] = user["displayName"];
+      updates[`/games/${game}/numberOfItems/player2`] = user["items"].length;
+      updates[`/games/${game}/subTasks/player2`] = quest["subTasks"];
+      updates[`/games/${game}/emails/player2`] = user["email"];
+      console.log(updates);
+      update(ref(rtdb), updates).then(() => {
+        console.log("updated")
+        navigation.navigate("multiplayerBattle");
       });
     }
 
-    // boost calculations
-    for (const item of items) {
-      if (item["name"] == "regeneration") {
-        // special regeneration stuff
-      } else if (item["type"] == "offensive")
-        damageBoost += item["damageBoost"];
-      else if (item["type"] == "deensive") healthBoost += item["healthBoost"];
-    }
-    // damage calculation
-    const damage = 100 / quest["subTasks"].length + damageBoost;
-
-    // health calculation
-    let health = 100 + healthBoost;
-
-    const updates = {};
-    updates[`/games/${id}/avatars/player2`] = user["avatar"];
-    updates[`/games/${id}/difficulty/player2`] = quest["difficulty"];
-    updates[`/games/${id}/healths/player2`] = health;
-    updates[`/games/${id}/damages/player2`] = damage;
-    updates[`/games/${id}/levels/player2`] = user["level"];
-    updates[`/games/${id}/names/player2`] = user["displayName"];
-    updates[`/games/${id}/numberOfItems/player2`] = items.length;
-    updates[`/games/${id}/subTasks/player2`] = quest["subTasks"];
-    updates[`/games/${id}/emails/player2`] = user["email"];
-    setGame(id);
-
-    update(ref(rtdb), updates).then(() =>
-      navigation.navigate("multiplayerBattle")
-    );
-  };
+  }, [health, damage, game])
 
   useEffect(() => {
+    console.log(quest);
     get(child(ref(rtdb), `games`)).then((games) => {
       let jsx = [];
 
