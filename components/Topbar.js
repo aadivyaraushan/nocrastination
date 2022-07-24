@@ -7,46 +7,53 @@ import { UserContext } from "../UserContext";
 function Topbar() {
   const { user, setUser } = useContext(UserContext);
   const db = getFirestore();
-  const currentLevel = Math.floor(0.07 * Math.sqrt(user["currentXp"]));
+  const currentLevel = Math.floor(0.07 * Math.sqrt(user["currentXp"])) === 0 ? 1 : Math.floor(0.07 * Math.sqrt(user["currentXp"]));
   const [xpAtNextLevel, setXpAtNextLevel] = useState(
-    Math.floor(((currentLevel + 1) / 0.07) ** 2)
+      Math.floor(((currentLevel + 1) / 0.07) ** 2)
   );
   const [currentLevelXp, setCurrentLevelXp] = useState(
-    Math.floor((currentLevel / 0.07) ** 2)
+      Math.floor((currentLevel / 0.07) ** 2)
   );
-  const [level, setLevel] = useState(currentLevel);
+  const [level, setLevel] = useState(currentLevel)
   useEffect(() => {
-    updateDoc(doc(db, "users", user["email"]), {
-      level,
-    }).then(() => {
-      console.log("updateDoc for level");
-      setUser({
-        activeQuest: user["activeQuest"],
-        avatar: user["avatar"],
-        coins: user["coins"],
-        currentXp: user["currentXp"],
-        diamonds: user["diamonds"],
-        displayName: user["displayName"],
-        email: user["email"],
-        emotes: user["emotes"],
-        items: user["items"],
-        level: currentLevel,
-        multiplier: user["multiplier"],
-        questsDone: user["questsDone"],
-        tasks: user["tasks"],
+    if(level === user.level)
+    {
+      console.log("Same level as before");
+    }
+    else {
+      console.log("Level up!");
+      updateDoc(doc(db, "users", user["email"]), {
+        level,
+      }).then(() => {
+        console.log("updateDoc for level");
+        setUser({
+          activeQuest: user["activeQuest"],
+          avatar: user["avatar"],
+          coins: user["coins"],
+          currentXp: user["currentXp"] === 0 ? 204 : user.currentXp,
+          diamonds: user["diamonds"],
+          displayName: user["displayName"],
+          email: user["email"],
+          emotes: user["emotes"],
+          items: user["items"],
+          level: currentLevel,
+          multiplier: user["multiplier"],
+          questsDone: user["questsDone"],
+          tasks: user["tasks"],
+        });
       });
-    });
+    }
   }, []);
 
   const [diamondsLocal, setDiamondsLocal] = useState(
-    <Text style={styles.iconText}>{user["diamonds"]}</Text>
+    <Text style={styles.iconText} adjustsFontSizeToFit={true} numberOfLines={1}>{user["diamonds"]}</Text>
   );
   const [coinsLocal, setCoinsLocal] = useState(
-    <Text style={styles.iconText}>{user["coins"]}</Text>
+    <Text style={styles.iconText} adjustsFontSizeToFit={true} numberOfLines={1}>{user["coins"]}</Text>
   );
   const [progressBar, setProgressBar] = useState(
     <View style={styles.progress}>
-      <Text style={styles.progressText}>
+      <Text style={styles.progressText} adjustsFontSizeToFit={true} numberOfLines={1}>
         {user["currentXp"] - currentLevelXp}/{xpAtNextLevel - currentLevelXp}
       </Text>
     </View>
@@ -62,11 +69,11 @@ function Topbar() {
     if (mounted) {
       setXpAtNextLevel(Math.floor(((level + 1) / 0.07) ** 2));
       setCurrentLevelXp(Math.floor((level / 0.07) ** 2));
-      setCoinsLocal(<Text style={styles.iconText}>{user["coins"]}</Text>);
-      setDiamondsLocal(<Text style={styles.iconText}>{user["diamonds"]}</Text>);
+      setCoinsLocal(<Text style={styles.iconText} adjustsFontSizeToFit={true} numberOfLines={1}>{user["coins"]}</Text>);
+      setDiamondsLocal(<Text style={styles.iconText} adjustsFontSizeToFit={true} numberOfLines={1}>{user["diamonds"]}</Text>);
       setProgressBar(
         <View style={styles.progress}>
-          <Text style={styles.progressText}>
+          <Text style={styles.progressText} adjustsFontSizeToFit={true} numberOfLines={1}>
             {user["currentXp"] - Math.floor((user["level"] / 0.07) ** 2)}/
             {Math.floor(((user["level"] + 1) / 0.07) ** 2) -
               Math.floor((user["level"] / 0.07) ** 2)}
@@ -104,7 +111,7 @@ function Topbar() {
     <View style={styles.header}>
       <View style={styles.levels}>
         <View style={styles.level}>
-          <Text style={styles.levelText}>{level}</Text>
+          <Text style={styles.levelText} adjustsFontSizeToFit={true} numberOfLines={1}>{level}</Text>
         </View>
         {progressBar}
       </View>
