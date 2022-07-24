@@ -16,20 +16,22 @@ function Topbar() {
   );
   const [level, setLevel] = useState(currentLevel)
   useEffect(() => {
+    console.log(user.level);
     if(level === user.level)
     {
       console.log("Same level as before");
     }
     else {
-      console.log("Level up!");
+      alert(`Level up! You'll be getting ${Math.round(((user.level*50)/5)**1.1)} coins now!`)
       updateDoc(doc(db, "users", user["email"]), {
         level,
+        coins: user.coins + Math.round(((user.level*50)/5)**1.1)
       }).then(() => {
         console.log("updateDoc for level");
         setUser({
           activeQuest: user["activeQuest"],
           avatar: user["avatar"],
-          coins: user["coins"],
+          coins: user["coins"] + Math.round(((user.level*50)/5)**1.1),
           currentXp: user["currentXp"] === 0 ? 204 : user.currentXp,
           diamonds: user["diamonds"],
           displayName: user["displayName"],
