@@ -9,9 +9,9 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, setDoc, getFirestore, doc } from "firebase/firestore";
+import { collection, setDoc, getFirestore, doc, Timestamp } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
 import { UserContext } from "../UserContext.js";
 import { useFonts } from "expo-font";
@@ -50,7 +50,10 @@ function Signup({ navigation }) {
       .then((userCredentials) => {
         var user = userCredentials.user;
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+        alert(error.message)
+        console.log(error.message);
+      });
 
     try {
       const docRef = doc(db, "users", email);
@@ -59,12 +62,13 @@ function Signup({ navigation }) {
         activeQuest: "",
         avatar,
         coins: 0,
-        currentXp: 0,
+        currentXp: 204,
         diamonds: 0,
         displayName: displayName,
         email: email,
         emotes: [],
         items: [],
+        lastLoggedIn: Timestamp.now(),
         level: 1,
         questsDone: 0,
         tasks: [],
@@ -81,8 +85,10 @@ function Signup({ navigation }) {
       navigation.navigate("homepage");
     } catch (e) {
       alert("Error: ", e.message);
+      console.log(e.message)
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -151,9 +157,9 @@ function Signup({ navigation }) {
                   <Pressable
                     onPress={() => {
                       setAvatar(avatar);
+                      console.log("avatar selected")
                       playSelect();
                     }}
-                    android_disableSound={true}
                   >
                     <Text style={styles.avatarText}>{avatar}</Text>
                     <Image style={styles.avatarImage} source={image}></Image>
@@ -162,7 +168,7 @@ function Signup({ navigation }) {
               );
             })}
           </ScrollView>
-          <Pressable onPress={handleSignUp} android_disableSound={true}>
+          <Pressable onPress={handleSignUp}>
             <Image
               source={require("./../assets/buttons/submit.png")}
               style={styles.submit}

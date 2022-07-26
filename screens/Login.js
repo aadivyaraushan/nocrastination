@@ -9,13 +9,32 @@ import {
 } from "react-native";
 import { useContext, useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { UserContext } from "../UserContext.js";
 import { auth, db } from "../firebase";
 import { Audio } from "expo-av";
 import { useFonts } from "expo-font";
 
 let userCred = null;
+
+function convertMsToTime(milliseconds) {
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
+
+  let seconds = Math.floor(milliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+
+  seconds = seconds % 60;
+  minutes = minutes % 60;
+
+  hours = hours % 24;
+
+  return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}:${padTo2Digits(
+      seconds,
+  )}`;
+}
 
 function Login({ navigation }) {
   const [email, onChangeEmail] = useState("");
@@ -37,8 +56,25 @@ function Login({ navigation }) {
 
     const docRef = await doc(db, "users", userCred.email);
     const docSnap = await getDoc(docRef);
+    const dayInMiliseconds = 24 * 60 * 60 * 1000;
+    const twoDaysInMiliseconds = 2 * dayInMiliseconds;
     if (docSnap.exists()) {
-      setUser(docSnap.data());
+      console.log(docSnap.data().lastLoggedIn.toDate());
+      const difference = Math.abs(docSnap.data().lastLoggedIn.toDate() - Date.now());
+      if(difference >= dayInMiliseconds && difference < twoDaysInMiliseconds) {
+        alert("Congrats on continuing your login streak!");
+        await updateDoc(docRef, {
+          lastLoggedIn: Timestamp.now(),
+          loginStreak: docSnap.data().loginStreak + 1,
+          coins: docSnap.data().coins + Math.round((docSnap.data().loginStreak+1 * 100)/60),
+        })
+        await setUser(docSnap.data());
+      }
+      else if(difference < dayInMiliseconds)
+      {
+        alert(`Come back in ${convertMsToTime(dayInMiliseconds - difference)} to continue your login streak!`);
+      }
+      console.log(difference);
       playSound();
       navigation.navigate("homepage");
     } else console.log("No such document!");
