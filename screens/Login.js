@@ -62,21 +62,21 @@ function Login({ navigation }) {
       console.log(docSnap.data().lastLoggedIn.toDate());
       const difference = Math.abs(docSnap.data().lastLoggedIn.toDate() - Date.now());
       if(difference >= dayInMiliseconds && difference < twoDaysInMiliseconds) {
-        alert("Congrats on continuing your login streak!");
+        alert(`Congrats on continuing your login streak! You'll be getting ${Math.round((docSnap.data().loginStreak+1 * 100)/60)} coins now.`);
         await updateDoc(docRef, {
           lastLoggedIn: Timestamp.now(),
           loginStreak: docSnap.data().loginStreak + 1,
           coins: docSnap.data().coins + Math.round((docSnap.data().loginStreak+1 * 100)/60),
         })
-        await setUser(docSnap.data());
       }
       else if(difference < dayInMiliseconds)
       {
         alert(`Come back in ${convertMsToTime(dayInMiliseconds - difference)} to continue your login streak!`);
       }
+      await setUser(docSnap.data());
+      await navigation.navigate("homepage");
       console.log(difference);
       playSound();
-      navigation.navigate("homepage");
     } else console.log("No such document!");
   };
 
@@ -97,6 +97,8 @@ function Login({ navigation }) {
         }
       : undefined;
   }, [sound]);
+
+
 
   return (
     <View style={styles.container}>

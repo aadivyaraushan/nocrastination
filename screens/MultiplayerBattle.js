@@ -104,10 +104,12 @@ const MultiplayerBattle = ({ route, navigation }) => {
   function playerWin() {
     alert("You won!");
     playVictory();
+    const winstreakMultiplier = user.winstreak+1;
 
     updateDoc(doc(db, "users", user["email"]), {
-      coins: user["coins"] + (multiplierCoins*rewardData[quest["difficulty"]]["coins"]),
-      currentXp: user["currentXp"] + (multiplierXP*rewardData[quest["difficulty"]]["xp"]),
+      coins: user["coins"] + winstreakMultiplier*(multiplierCoins*rewardData[quest["difficulty"]]["coins"]),
+      currentXp: user["currentXp"] + winstreakMultiplier*(multiplierXP*rewardData[quest["difficulty"]]["xp"]),
+      winstreak: user.winstreak+1
     })
       .then(() => {
         console.log("User document updated");
@@ -136,8 +138,8 @@ const MultiplayerBattle = ({ route, navigation }) => {
         setUser({
           activeQuest: user["activeQuest"],
           avatar: user["avatar"],
-          coins: user["coins"] + rewardData[quest["difficulty"]]["coins"],
-          currentXp: user["currentXp"] + rewardData[quest["difficulty"]]["xp"],
+          coins: user["coins"] + winstreakMultiplier*(multiplierCoins*rewardData[quest["difficulty"]]["coins"]),
+          currentXp: user["currentXp"] + winstreakMultiplier*(multiplierXP*rewardData[quest["difficulty"]]["xp"]),
           diamonds: user["diamonds"],
           displayName: user["displayName"],
           email: user["email"],
@@ -147,6 +149,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
           multiplier: user["multiplier"],
           questsDone: user["questsDone"],
           tasks: user["tasks"],
+          winstreak: user.winstreak+1
         });
       })
       .then(() => {
@@ -171,8 +174,19 @@ const MultiplayerBattle = ({ route, navigation }) => {
     updateDoc(doc(db, "tasks", quest["title"]), {
       subTasks: subTasks,
     }).then(() => {
+      updateDoc(doc(db, "users", user.email), {
+        winstreak: 0
+      })
+    }).then(() => {
+      setUser(user => {
+        return {
+          ...user,
+          winstreak: user.winstreak+1
+        }
+      })
+    }).then(() => {
       navigation.navigate("homepage");
-    });
+    })
   }
 
   // Preventing user from exiting the game

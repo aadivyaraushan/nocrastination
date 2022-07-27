@@ -72,6 +72,7 @@ function Signup({ navigation }) {
         level: 1,
         questsDone: 0,
         tasks: [],
+        winstreak: 0
       };
 
       playSubmit();
