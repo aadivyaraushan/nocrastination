@@ -4,6 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
+  Pressable
 } from "react-native";
 import React from "react";
 import { useContext } from "react";
@@ -41,8 +43,8 @@ const Organisation = () => {
           <ScrollView>
             {organisation["members"].map((member, index) => {
               if (index == 0)
-                return <Text style={styles.text}>{member} (leader)</Text>;
-              return <Text style={styles.text}>{member}</Text>;
+                return <Text style={styles.text} key={index}>{member} (leader)</Text>;
+              return <Text style={styles.text} key={index}>{member}</Text>;
             })}
           </ScrollView>
         </ImageBackground>
@@ -60,6 +62,9 @@ const Organisation = () => {
             Minimum coins: {organisation["requirements"]["minCoins"]} coins
           </Text>
         </ImageBackground>
+        <Pressable onPress={() => alert("Joining organisation")}>
+          <Image source={require("../assets/buttons/join.png")} style={styles.joinButton} />
+        </Pressable>
         <BottomBar />
       </ImageBackground>
     </View>
@@ -109,4 +114,8 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
+  joinButton: {
+    marginTop: 30,
+    resizeMode: "contain",
+  }
 });
