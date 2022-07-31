@@ -55,10 +55,6 @@ function Topbar() {
         }
     }, []);
 
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
-
     const [diamondsLocal, setDiamondsLocal] = useState(
         <Text style={styles.iconText} adjustsFontSizeToFit={true} numberOfLines={1}>
             {user['diamonds']}

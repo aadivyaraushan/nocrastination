@@ -49,10 +49,6 @@ const Shop = () => {
     }
 
     useEffect(() => {
-        console.log(user);
-    }, [user]);
-
-    useEffect(() => {
         getDocs(q)
             .then((querySnapshot) =>
                 querySnapshot.forEach((doc) => {

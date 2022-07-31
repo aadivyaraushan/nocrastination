@@ -18,8 +18,6 @@ const QuestActive = ({ route, navigation }) => {
         PlayMeGames: require('../assets/fonts/Playmegames-Regular.ttf')
     });
 
-    const [isGameOver, setIsGameOver] = useState(false);
-
     const potentialBackgrounds = [
         require('../assets/backgrounds/activeTaskBackgrounds/activePage1.png'),
         require('../assets/backgrounds/activeTaskBackgrounds/activePage2.png'),
@@ -32,16 +30,25 @@ const QuestActive = ({ route, navigation }) => {
 
     const { quest, setQuest } = useContext(QuestContext);
     const [time, setTime] = useState(quest['duration']);
+    const isGameOver = time === 0;
     const [loaded] = useFonts({
         RetroGaming: require('../assets/fonts/RetroGaming-Regular.ttf')
     });
     const [multiplierXP, setMultiplierXP] = useState(1);
     const [multiplierCoins, setMultiplierCoins] = useState(1);
+    const [intervalId, setIntervalId] = useState(null);
 
     useEffect(() => {
-        setInterval(() => {
-            setTime((time) => time - 1);
-        }, 1000);
+        setIntervalId(
+            setInterval(() => {
+                if (time === 0) {
+                    // setIsGameOver(true);
+                    return;
+                }
+                setTime((time) => time - 1);
+                // setIsGameOver(false);
+            }, 1000)
+        );
         user.items.map((item) => {
             console.log(item);
             const updateMultipliers = async () => {
@@ -60,26 +67,37 @@ const QuestActive = ({ route, navigation }) => {
     }, []);
 
     useEffect(() => {
-        console.log('multiplier XP and coins(respectively): ', multiplierXP, multiplierCoins);
-    }, [multiplierXP, multiplierCoins]);
-
-    useEffect(() => {
+        console.log('isGameOver: ', isGameOver);
+        // console.log('navigation called');
         navigation.addListener('beforeRemove', (e) => {
+            // if (!isGameOver) {
+            //     console.log("Game isn't over");
+            //     Alert.alert('You cannot leave until the quest is complete!', '', [
+            //         { text: 'OK', onPress: () => {} }
+            //     ]);
+            // } else {
+            //     console.log('Game is over');
+            //     Alert.alert('You may leave now');
+            //     navigation.dispatch(e.data.action);
+            // }
             e.preventDefault();
-            if (!isGameOver) {
-                Alert.alert('You cannot leave until the quest is complete!', '', [
-                    { text: 'OK', onPress: () => {} }
-                ]);
-            } else if (isGameOver) {
+            console.log('navigation called');
+            if (isGameOver === true || time === 0) {
+                console.log('game is over');
                 navigation.dispatch(e.data.action);
+                return;
             }
+            console.log("Game isn't over");
+            Alert.alert('You cannot leave until the quest is complete!', '', [
+                { text: 'OK', onPress: () => {} }
+            ]);
+            console.log('alert sent');
         });
-    }, [navigation, isGameOver]);
+    }, [isGameOver, navigation]);
 
     useEffect(() => {
-        console.log(time);
         if (time === 0) {
-            console.log('time is up');
+            clearInterval(intervalId);
             Alert.alert('Quest Completed?', 'Have you completed the quest?', [
                 {
                     text: 'Yes',
@@ -87,7 +105,6 @@ const QuestActive = ({ route, navigation }) => {
                         Alert.alert('Quest completed! You will now receive the rewards.');
                         const prevCoins = user.coins;
                         const prevXP = user.currentXp;
-                        console.log(prevCoins, prevXP);
                         const tasks = user.tasks;
                         tasks.splice(tasks.indexOf(quest.title), 1);
                         // setUser({
@@ -123,13 +140,14 @@ const QuestActive = ({ route, navigation }) => {
                             tasks: user.tasks
                         })
                             .then(() => {
-                                console.log('updateDoc for quest rewards');
-                                setIsGameOver(true);
+                                // console.log('updateDoc for quest rewards');
+                                // setIsGameOver(true);
+
                                 deleteDoc(doc(db, 'tasks', quest.title));
                             })
                             .then(() => {
-                                console.log('deleteDoc for quest');
                                 navigation.navigate('homepage');
+                                // console.log('deleteDoc for quest');
                             });
                     }
                 },
@@ -137,18 +155,15 @@ const QuestActive = ({ route, navigation }) => {
                     text: 'No',
                     onPress: () => {
                         Alert.alert("You won't be getting the rewards. Good try.");
-                        setIsGameOver(true);
+                        // setIsGameOver(true);
                         navigation.navigate('homepage');
                     }
                 }
             ]);
-            setStatusBarHidden(false);
+
+            NavigationBar.setVisibilityAsync('visible').then(() => setStatusBarHidden(false));
         }
     }, [time]);
-
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
 
     return (
         <View>
