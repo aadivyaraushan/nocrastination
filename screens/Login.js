@@ -99,6 +99,10 @@ function Login({ navigation }) {
             : undefined;
     }, [sound]);
 
+    useEffect(() => {
+        console.log(user);
+    }, [user]);
+
     return (
         <View style={styles.container}>
             <ImageBackground
