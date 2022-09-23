@@ -49,6 +49,7 @@ function Login({ navigation }) {
         const docSnap = await getDoc(docRef);
         const dayInMiliseconds = 24 * 60 * 60 * 1000;
         const twoDaysInMiliseconds = 2 * dayInMiliseconds;
+        let coins = docSnap.data().coins;
         if (docSnap.exists()) {
             console.log(docSnap.data().lastLoggedIn.toDate());
             const difference = Math.abs(docSnap.data().lastLoggedIn.toDate() - Date.now());
@@ -59,12 +60,12 @@ function Login({ navigation }) {
                     )} coins now.`
                 );
                 await updateDoc(docRef, {
-                    lastLoggedIn: Timestamp.now(),
                     loginStreak: docSnap.data().loginStreak + 1,
                     coins:
                         docSnap.data().coins +
                         Math.round(((docSnap.data().loginStreak + 1) * 100) / 60)
                 });
+                coins += Math.round(((docSnap.data().loginStreak + 1) * 100) / 60);
             } else if (difference < dayInMiliseconds) {
                 alert(
                     `Come back in ${convertMsToTime(
@@ -74,8 +75,10 @@ function Login({ navigation }) {
             }
             await setUser({
                 ...docSnap.data(),
-                coins:
-                    docSnap.data().coins + Math.round(((docSnap.data().loginStreak + 1) * 100) / 60)
+                coins
+            });
+            await updateDoc(docRef, {
+                lastLoggedIn: Timestamp.now()
             });
             await navigation.navigate('homepage');
             console.log(difference);

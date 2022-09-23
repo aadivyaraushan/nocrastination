@@ -1,32 +1,20 @@
-import {
-    StyleSheet,
-    Text,
-    View,
-    ImageBackground,
-    Image,
-    Pressable,
-    ScrollView,
-    Animated,
-    Alert
-} from 'react-native';
-import React, { useEffect } from 'react';
-import { useContext, useRef, useState } from 'react';
-import { QuestContext } from '../QuestContext';
-import { GameContext } from '../GameContext';
+import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {QuestContext} from '../QuestContext';
+import {GameContext} from '../GameContext';
 import HealthBar from '../components/HealthBar';
-import { setButtonStyleAsync } from 'expo-navigation-bar';
-import { UserContext } from '../UserContext';
-import { deleteDoc, doc, updateDoc } from '@firebase/firestore';
-import { db, rtdb } from '../firebase';
-import { Audio } from 'expo-av';
-import { useFonts } from 'expo-font';
-import { child, get, onValue, ref, remove, set, update } from 'firebase/database';
+import {UserContext} from '../UserContext';
+import {deleteDoc, doc, updateDoc} from '@firebase/firestore';
+import {db, rtdb} from '../firebase';
+import {Audio} from 'expo-av';
+import {useFonts} from 'expo-font';
+import {child, get, onValue, ref, remove, set, update} from 'firebase/database';
 
-const MultiplayerBattle = ({ route, navigation }) => {
+const MultiplayerBattle = ({route, navigation}) => {
     // Declaration of necessary context
-    const { user, setUser } = useContext(UserContext);
-    const { quest, setQuest } = useContext(QuestContext);
-    const { game, setGame } = useContext(GameContext);
+    const {user, setUser} = useContext(UserContext);
+    const {quest, setQuest} = useContext(QuestContext);
+    const {game, setGame} = useContext(GameContext);
 
     // Declaration of necessary data
     const rewardData = route.params;
@@ -34,11 +22,14 @@ const MultiplayerBattle = ({ route, navigation }) => {
     const [attackPressed, setAttackPressed] = useState(false);
     const [sound, setSound] = useState();
     const [isGameOver, setIsGameOver] = useState(false);
+    const [isPlayerOne, setIsPlayerOne] = useState(null);
+    const [damage, setDamage] = useState();
     const [] = useFonts({
         RetroGaming: require('../assets/fonts/RetroGaming-Regular.ttf'),
         InkyThinPixels: require('../assets/fonts/InkyThinPixels-Regular.ttf'),
         PlayMeGames: require('../assets/fonts/Playmegames-Regular.ttf')
     });
+    // const [isLoaded, setIsLoaded] = useState(false);
 
     // Multipliers
     const [multiplierXP, setMultiplierXP] = useState(1);
@@ -46,7 +37,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
     useEffect(() => {
         user.items.map((item) => {
-            console.log(item);
+            // console.log(item);
             const updateMultipliers = async () => {
                 const docSnap = await getDoc(doc(db, 'shop', item));
                 if (docSnap.exists()) {
@@ -55,34 +46,53 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     );
                     setMultiplierXP((multiplierXP) => multiplierXP * docSnap.data().multiplierXP);
                 } else {
-                    console.log('item not found');
+                    // console.log('item not found');
                 }
             };
             updateMultipliers();
+        });
+
+        get(child(ref(rtdb), `games/${game}/emails`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                setIsPlayerOne(snapshot.val()['player1'] === user['email']);
+                console.log(
+                    'isPlayerOne(when initially set): ',
+                    snapshot.val()['player1'] === user['email']
+                );
+            }
+        });
+        get(child(ref(rtdb), `games/${game}/damages`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                if (isPlayerOne) {
+                    setDamage(snapshot.val()['player1']);
+                } else {
+                    setDamage(snapshot.val()['player2']);
+                }
+            }
         });
     }, []);
 
     // Sound functions
     async function playDamaged() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/damaged.mp3'));
+        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/damaged.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playVictory() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/victory.mp3'));
+        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/victory.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playDefeat() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/defeat.mp3'));
+        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/defeat.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playAttack() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/attack.mp3'));
+        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/attack.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
@@ -90,13 +100,15 @@ const MultiplayerBattle = ({ route, navigation }) => {
     function playerWin() {
         alert('You won!');
         playVictory();
-        console.log(user);
-        console.log('winstreak', user.winstreak);
+        // console.log(user);
+        // console.log('winstreak', user.winstreak);
         const winstreakMultiplier = user.winstreak + 1;
-        console.log('winstreakMultiplier: ', winstreakMultiplier);
-        console.log('coin multiplier: ', multiplierCoins);
-        console.log('xp multiplier: ', multiplierXP);
-
+        // console.log('winstreakMultiplier: ', winstreakMultiplier);
+        // console.log('coin multiplier: ', multiplierCoins);
+        // console.log('xp multiplier: ', multiplierXP);
+        update(ref(rtdb, `games/${game}`), {
+            isOver: true
+        });
         updateDoc(doc(db, 'users', user['email']), {
             coins:
                 user['coins'] +
@@ -107,29 +119,29 @@ const MultiplayerBattle = ({ route, navigation }) => {
             winstreak: user.winstreak + 1
         })
             .then(() => {
-                console.log('User document updated');
+                // console.log('User document updated');
                 // remove quest if subTasks is empty, otherwise update quest subTasks
-                console.log(subTasks);
+                // console.log(subTasks);
                 if (subTasks === [] || subTasks === null || subTasks === undefined) {
-                    console.log('if called');
-                    console.log('User tasks: ', user['tasks']);
-                    console.log('Task index: ', user['tasks'].indexOf(quest['title']));
+                    // console.log('if called');
+                    // console.log('User tasks: ', user['tasks']);
+                    // console.log('Task index: ', user['tasks'].indexOf(quest['title']));
                     user['tasks'].splice(user['tasks'].indexOf(quest['title']), 1);
-                    console.log('New Tasks: ', user['tasks']);
+                    // console.log('New Tasks: ', user['tasks']);
                     updateDoc(doc(db, 'users', user['email']), {
                         tasks: user['tasks']
                     }).then(() => {
                         deleteDoc(doc(db, 'tasks', quest['title']));
                     });
                 } else {
-                    console.log('else called');
+                    // console.log('else called');
                     updateDoc(doc(db, 'tasks', quest['title']), {
                         subTasks: subTasks
                     });
                 }
             })
             .then(() => {
-                console.log('Updated quest-related documents');
+                // console.log('Updated quest-related documents');
                 // setUser({
                 //     activeQuest: user['activeQuest'],
                 //     avatar: user['avatar'],
@@ -156,17 +168,17 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     coins:
                         user['coins'] +
                         winstreakMultiplier *
-                            (multiplierCoins * rewardData[quest['difficulty']]['coins']),
+                        (multiplierCoins * rewardData[quest['difficulty']]['coins']),
                     currentXp:
                         user['currentXp'] +
                         winstreakMultiplier * (multiplierXP * rewardData[quest['difficulty']]['xp'])
                 }));
             })
             .then(() => {
-                console.log('User context updated');
+                // console.log('User context updated');
             })
             .then(() => {
-                console.log('Game removed');
+                // console.log('Game removed');
                 setIsGameOver(true);
             })
             .then(() => {
@@ -208,25 +220,16 @@ const MultiplayerBattle = ({ route, navigation }) => {
             e.preventDefault();
             if (!isGameOver) {
                 Alert.alert('You cannot leave until the quest is complete!', '', [
-                    { text: 'OK', onPress: () => {} }
+                    {
+                        text: 'OK', onPress: () => {
+                        }
+                    }
                 ]);
             } else if (isGameOver) {
                 navigation.dispatch(e.data.action);
             }
         });
     }, [navigation, isGameOver]);
-
-    // Declaring damage for player
-    let damage = 0;
-    get(child(ref(rtdb), `games/${game}/damages`)).then((snapshot) => {
-        if (snapshot.exists()) {
-            if (isPlayerOne) {
-                damage = snapshot.val()['player1'];
-            } else {
-                damage = snapshot.val()['player2'];
-            }
-        }
-    });
 
     // Declaring state
     const [emotePressed, setEmotePressed] = useState('');
@@ -260,21 +263,19 @@ const MultiplayerBattle = ({ route, navigation }) => {
     const [displayName2, setDisplayName2] = useState();
     const [subTasks1, setSubTasks1] = useState(<></>);
     const [subTasks2, setSubTasks2] = useState(<></>);
-    const [isPlayerOne, setIsPlayerOne] = useState();
     const [lowerHealthBar, setLowerHealthBar] = useState(
-        <HealthBar health={health1} isLower={true} />
+        <HealthBar health={health1} isLower={true}/>
     );
     const [upperHealthBar, setUpperHealthBar] = useState(
-        <HealthBar health={health2} isLower={false} />
+        <HealthBar health={health2} isLower={false}/>
     );
     useEffect(() => {
         // Declaring isPlayerOne
-        get(child(ref(rtdb), `games/${game}/emails`)).then((snapshot) => {
-            if (snapshot.exists()) {
-                setIsPlayerOne(snapshot.val()['player1'] === user['email']);
-                // console.log(isPlayerOne);
-            }
-        });
+    }, []);
+
+    useEffect(() => {
+        console.log('isPlayerOne: ', isPlayerOne);
+        // Declaring damage for player
 
         // Getting subTasks one time
         get(child(ref(rtdb), `games/${game}/subTasks`)).then((snapshot) => {
@@ -330,6 +331,22 @@ const MultiplayerBattle = ({ route, navigation }) => {
             });
         });
 
+        // Getting isLoaded one time
+        // get(child(ref(rtdb), `games/${game}/isLoaded`)).then((snapshot) => {
+        //     if (snapshot.exists()) {
+        //         console.log('isLoaded: ', snapshot.val());
+        //         setIsLoaded(snapshot.val());
+        //     }
+
+        //     onValue(ref(rtdb, `games/${game}/isLoaded`), (snapshot) => {
+        //         // console.log('Health listener called');
+        //         if (snapshot.exists()) {
+        //             console.log('isLoaded: ', snapshot.val());
+        //             setIsLoaded(snapshot.val());
+        //         }
+        //     });
+        // });
+
         // Getting avatars
         get(child(ref(rtdb), `games/${game}/avatars`)).then((snapshot) => {
             if (snapshot.exists()) {
@@ -384,35 +401,35 @@ const MultiplayerBattle = ({ route, navigation }) => {
             }
         });
 
-        console.log('Attached listeners for subTasks and healths');
+        // console.log('Attached listeners for subTasks and healths');
 
         // Listener for emotes
         onValue(ref(rtdb, `games/${game}/emote`), (snapshot) => {
             if (snapshot.exists()) {
-                console.log('Emote used: ', snapshot);
+                // console.log('Emote used: ', snapshot);
                 if (snapshot.val()['byPlayerOne']) {
                     if (isPlayerOne) {
                         // show animation for player one on left side
-                        console.log('Emote used by player one -  showing animation on left side');
+                        // console.log('Emote used by player one -  showing animation on left side');
                     } else {
                         // show animation for player one on right side
-                        console.log('Emote used by player one -  showing animation on right side');
+                        // console.log('Emote used by player one -  showing animation on right side');
                     }
                 } else {
                     // animation was used by player 2
                     if (isPlayerOne) {
                         // show animation for player two on right side
-                        console.log('Emote used by player two -  showing animation on right side');
+                        // console.log('Emote used by player two -  showing animation on right side');
                     } else {
                         // show animation for player two on left side
-                        console.log('Emote used by player two -  showing animation on left side');
+                        // console.log('Emote used by player two -  showing animation on left side');
                     }
                 }
             } else {
-                console.log("Emote snapshot doesn't exist");
+                // console.log("Emote snapshot doesn't exist");
             }
         });
-    }, []);
+    }, [isPlayerOne]);
 
     useEffect(() => {
         console.log('Healths were changed: ', health1, health2);
@@ -421,8 +438,8 @@ const MultiplayerBattle = ({ route, navigation }) => {
         } else if (health2 <= 0) {
             playerWin();
         }
-        setUpperHealthBar(<HealthBar health={health2} isLower={false} />);
-        setLowerHealthBar(<HealthBar health={health1} isLower={true} />);
+        setUpperHealthBar(<HealthBar health={health2} isLower={false}/>);
+        setLowerHealthBar(<HealthBar health={health1} isLower={true}/>);
     }, [health1, health2]);
 
     useEffect(() => {
@@ -449,10 +466,10 @@ const MultiplayerBattle = ({ route, navigation }) => {
                                                     subTasksTemp.indexOf(subTask),
                                                     1
                                                 );
-                                                console.log(
-                                                    'subTasksTemp(in subTasks1 JSX): ',
-                                                    subTasksTemp
-                                                );
+                                                // console.log(
+                                                //     'subTasksTemp(in subTasks1 JSX): ',
+                                                //     subTasksTemp
+                                                // );
                                                 const updates = {};
                                                 if (isPlayerOne) {
                                                     updates[`games/${game}/subTasks/player1`] =
@@ -488,53 +505,10 @@ const MultiplayerBattle = ({ route, navigation }) => {
                 );
             }
             setSubTasks2(<Text style={styles.text}>...</Text>);
-            // } else {
-            //   // console.log(health2);
-            //   if (subTasks) {
-            //     setSubTasks1(
-            //       <>
-            //         {subTasks.map((subTask, index) => {
-            //           return (
-            //             <Pressable
-            //               onPress={() => {
-            //                 console.log("Pressed");
-            //                 if (count < 60) {
-            //                   alert("Wait 1 min before checking off another sub-quest");
-            //                 } else {
-            //                   let subTasksTemp = subTasks;
-            //                   subTasksTemp.splice(subTasksTemp.indexOf(subTask), 1);
-            //                   const updates = {};
-            //                   updates[`games/${game}/subTasks/player2`] = subTasksTemp;
-            //                   console.log("Health2: " + health2);
-            //                   console.log("Damage: " + damage);
-            //                   updates[`games/${game}/healths/player1`] =
-            //                     health2 - damage;
-            //                   // console.log(updates);
-
-            //                   update(ref(rtdb), updates).then(() => {
-            //                     setAttackPressed(true);
-            //                     playAttack();
-            //                     // setHealth1(health1 - damage);
-            //                   });
-            //                 }
-            //               }}
-            //               key={index}
-            //               style={styles.textContainer}
-            //               disabled={isPlayerOne}
-            //               android_disableSound={true}
-            //             >
-            //               <Text style={styles.text} key={index}>
-            //                 □{subTask}
-            //               </Text>
-            //             </Pressable>
-            //           );
-            //         })}
-            //       </>
-            //     );
-            //   }
-            //   setSubTasks2(<Text style={styles.text}>...</Text>);
         }
     }, [subTasks, health2]);
+
+    useEffect(() => console.log('Damage: ', damage), [damage]);
 
     useEffect(() => {
         const arrJSX = [];
@@ -560,7 +534,7 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     onPress={() => setEmotePressed(emoteName)}
                     // disabled={!(health2 <= 0 || health1 <= 0)}
                 >
-                    <Image key={index} source={emote} style={styles.emote} />
+                    <Image key={index} source={emote} style={styles.emote}/>
                 </Pressable>
             );
         });
@@ -575,23 +549,23 @@ const MultiplayerBattle = ({ route, navigation }) => {
 
     useEffect(() => {
         if (emotePressed != '') {
-            console.log('Pressed emote: ' + emotePressed);
+            // console.log('Pressed emote: ' + emotePressed);
             set(ref(rtdb, `games/${game}/emote`), {
                 emotePressed,
                 byPlayerOne: isPlayerOne
             }).then(() => {
-                console.log('set emote in database');
+                // console.log('set emote in database');
             });
         }
     }, [emotePressed]);
 
+    // useKeepAwake();
     return (
         <View>
             <ImageBackground
                 source={require('../assets/backgrounds/background.png')}
                 style={styles.bg}
             >
-                {/* {emotesJSX} */}
                 <View style={styles.panelsContainer}>
                     <ImageBackground style={styles.subTasksPanel}>
                         <View style={styles.subTasksContainer}>
@@ -607,9 +581,9 @@ const MultiplayerBattle = ({ route, navigation }) => {
                     </ImageBackground>
                 </View>
                 {upperHealthBar}
-                <Image style={styles.upperAvatar} source={player2Avatar} />
+                <Image style={styles.upperAvatar} source={player2Avatar}/>
                 {/* {player2Emote} */}
-                <Image style={styles.lowerAvatar} source={player1Avatar} />
+                <Image style={styles.lowerAvatar} source={player1Avatar}/>
                 {/* {player1Emote} */}
                 {lowerHealthBar}
             </ImageBackground>
@@ -669,7 +643,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginBottom: 100,
         resizeMode: 'contain',
-        transform: [{ scaleX: -1 }],
+        transform: [{scaleX: -1}],
         bottom: '30%'
     },
     upperAvatar: {
@@ -693,5 +667,12 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap'
+    },
+    container: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%'
     }
 });

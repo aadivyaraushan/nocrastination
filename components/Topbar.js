@@ -49,7 +49,8 @@ function Topbar() {
                 setUser((user) => ({
                     ...user,
                     coins: user.coins + Math.round(((user.level * 50) / 5) ** 1.1),
-                    currentXp: user.currentXp === 0 ? 204 : user.currentXp
+                    currentXp: user.currentXp === 0 ? 204 : user.currentXp,
+                    level
                 }));
             });
         }

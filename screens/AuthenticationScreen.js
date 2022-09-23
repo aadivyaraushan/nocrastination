@@ -10,7 +10,6 @@ function AuthenticationScreen({ navigation }) {
         InkyThinPixels: require('../assets/fonts/InkyThinPixels-Regular.ttf'),
         PlayMeGames: require('../assets/fonts/Playmegames-Regular.ttf')
     });
-    console.log(loaded, error);
 
     // async function playSound() {
     //   const { sound } = await Audio.Sound.createAsync(

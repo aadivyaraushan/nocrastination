@@ -1,22 +1,24 @@
-import { StyleSheet, Text, View, ImageBackground, Alert } from 'react-native';
-import { useContext, useMemo, useState } from 'react';
-import { QuestContext } from '../QuestContext';
-import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
+import {Alert, ImageBackground, StyleSheet, Text, View} from 'react-native';
+import {useContext, useEffect, useMemo, useState} from 'react';
+import {QuestContext} from '../QuestContext';
+import {useFonts} from 'expo-font';
 import * as NavigationBar from 'expo-navigation-bar';
-import { setStatusBarHidden, StatusBar } from 'expo-status-bar';
-import { UserContext } from '../UserContext';
-import { getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import {setStatusBarHidden} from 'expo-status-bar';
+import {UserContext} from '../UserContext';
+import {deleteDoc, doc, getDoc, updateDoc} from 'firebase/firestore';
+import {db} from '../firebase';
+import {useKeepAwake} from 'expo-keep-awake';
 
-const QuestActive = ({ route, navigation }) => {
+const QuestActive = ({route, navigation}) => {
+    useKeepAwake();
     const rewardData = route.params;
-    const { user, setUser } = useContext(UserContext);
+    const {user, setUser} = useContext(UserContext);
     const [] = useFonts({
         RetroGaming: require('../assets/fonts/RetroGaming-Regular.ttf'),
         InkyThinPixels: require('../assets/fonts/InkyThinPixels-Regular.ttf'),
         PlayMeGames: require('../assets/fonts/Playmegames-Regular.ttf')
     });
+    const [subTasks, setSubTasks] = useState([]);
 
     const potentialBackgrounds = [
         require('../assets/backgrounds/activeTaskBackgrounds/activePage1.png'),
@@ -28,7 +30,7 @@ const QuestActive = ({ route, navigation }) => {
         []
     );
 
-    const { quest, setQuest } = useContext(QuestContext);
+    const {quest, setQuest} = useContext(QuestContext);
     const [time, setTime] = useState(quest['duration']);
     const isGameOver = time === 0;
     const [loaded] = useFonts({
@@ -38,6 +40,37 @@ const QuestActive = ({ route, navigation }) => {
     const [multiplierCoins, setMultiplierCoins] = useState(1);
     const [intervalId, setIntervalId] = useState(null);
 
+    const questComplete = async () => {
+        const prevCoins = user.coins;
+        const prevXP = user.currentXp;
+        const tasks = user.tasks;
+        tasks.splice(tasks.indexOf(quest.title), 1);
+        setUser((user) => ({
+            ...user,
+            coins:
+                user.coins + multiplierCoins * rewardData[quest.difficulty].coins,
+            currentXp:
+                user.currentXp + multiplierXP * rewardData[quest.difficulty].xp,
+            questsDone: user.questsDone + 1,
+            tasks
+        }));
+        console.log('user context updated');
+        updateDoc(doc(db, 'users', user.email), {
+            coins: prevCoins + multiplierCoins * rewardData[quest.difficulty].coins,
+            currentXp: prevXP + multiplierXP * rewardData[quest.difficulty].xp,
+            tasks: user.tasks
+        })
+            .then(() => {
+                // console.log('updateDoc for quest rewards');
+                // setIsGameOver(true);
+
+                deleteDoc(doc(db, 'tasks', quest.title));
+            })
+            .then(() => {
+                navigation.navigate('homepage');
+                // console.log('deleteDoc for quest');
+            });
+    }
     useEffect(() => {
         setIntervalId(
             setInterval(() => {
@@ -68,18 +101,7 @@ const QuestActive = ({ route, navigation }) => {
 
     useEffect(() => {
         console.log('isGameOver: ', isGameOver);
-        // console.log('navigation called');
         navigation.addListener('beforeRemove', (e) => {
-            // if (!isGameOver) {
-            //     console.log("Game isn't over");
-            //     Alert.alert('You cannot leave until the quest is complete!', '', [
-            //         { text: 'OK', onPress: () => {} }
-            //     ]);
-            // } else {
-            //     console.log('Game is over');
-            //     Alert.alert('You may leave now');
-            //     navigation.dispatch(e.data.action);
-            // }
             e.preventDefault();
             console.log('navigation called');
             if (isGameOver === true || time === 0) {
@@ -89,7 +111,10 @@ const QuestActive = ({ route, navigation }) => {
             }
             console.log("Game isn't over");
             Alert.alert('You cannot leave until the quest is complete!', '', [
-                { text: 'OK', onPress: () => {} }
+                {
+                    text: 'OK', onPress: () => {
+                    }
+                }
             ]);
             console.log('alert sent');
         });
@@ -103,52 +128,7 @@ const QuestActive = ({ route, navigation }) => {
                     text: 'Yes',
                     onPress: () => {
                         Alert.alert('Quest completed! You will now receive the rewards.');
-                        const prevCoins = user.coins;
-                        const prevXP = user.currentXp;
-                        const tasks = user.tasks;
-                        tasks.splice(tasks.indexOf(quest.title), 1);
-                        // setUser({
-                        //     coins:
-                        //         user.coins + multiplierCoins * rewardData[quest.difficulty].coins,
-                        //     currentXp:
-                        //         user.currentXp + multiplierXP * rewardData[quest.difficulty].xp,
-                        //     diamonds: user.diamonds,
-                        //     displayName: user.displayName,
-                        //     email: user.email,
-                        //     level: user.level,
-                        //     questsDone: user.questsDone + 1,
-                        //     avatar: user.avatar,
-                        //     activeQuest: user.activeQuest,
-                        //     emotes: user.emotes,
-                        //     items: user.items,
-                        //     tasks: user.tasks,
-                        //     winstreak: user.winstreak
-                        // });
-                        setUser((user) => ({
-                            ...user,
-                            coins:
-                                user.coins + multiplierCoins * rewardData[quest.difficulty].coins,
-                            currentXp:
-                                user.currentXp + multiplierXP * rewardData[quest.difficulty].xp,
-                            questsDone: user.questsDone + 1,
-                            tasks
-                        }));
-                        console.log('user context updated');
-                        updateDoc(doc(db, 'users', user.email), {
-                            coins: prevCoins + multiplierCoins * rewardData[quest.difficulty].coins,
-                            currentXp: prevXP + multiplierXP * rewardData[quest.difficulty].xp,
-                            tasks: user.tasks
-                        })
-                            .then(() => {
-                                // console.log('updateDoc for quest rewards');
-                                // setIsGameOver(true);
-
-                                deleteDoc(doc(db, 'tasks', quest.title));
-                            })
-                            .then(() => {
-                                navigation.navigate('homepage');
-                                // console.log('deleteDoc for quest');
-                            });
+                        questComplete();
                     }
                 },
                 {
@@ -165,6 +145,11 @@ const QuestActive = ({ route, navigation }) => {
         }
     }, [time]);
 
+    useEffect(() => {
+        console.log(quest);
+    }, [quest]);
+
+
     return (
         <View>
             <ImageBackground
@@ -179,6 +164,16 @@ const QuestActive = ({ route, navigation }) => {
                 <Text style={styles.timerText}>
                     {Math.floor(time / 60) + ':' + Math.round(time % 60)}
                 </Text>
+                <View>
+                    {quest.subTasks.map((subTask) => {
+                        return (
+                            <ImageBackground style={styles.subTaskContainer}
+                                             source={require('../assets/backgrounds/panels/shopPanel.png')}>
+                                <Text style={styles.subTaskText}>{subTask}</Text>
+                            </ImageBackground>
+                        );
+                    })}
+                </View>
             </ImageBackground>
         </View>
     );
@@ -199,7 +194,6 @@ const styles = StyleSheet.create({
         width: '100%',
         color: 'white',
         fontFamily: 'PlayMeGames'
-
         // if i is even then it should be to the right else to the left
     },
     timerText: {
@@ -209,5 +203,20 @@ const styles = StyleSheet.create({
         width: '100%',
         color: 'white',
         fontFamily: 'PlayMeGames'
+    },
+    subTaskText: {
+        fontSize: 25,
+        color: 'white',
+        fontFamily: 'PlayMeGames',
+        top: 0,
+        left: 0,
+        position: 'relative'
+
+    },
+    subTaskContainer: {
+        flex: 1,
+        flexWrap: 'nowrap',
+        width: '100%',
+        height: '100%'
     }
 });

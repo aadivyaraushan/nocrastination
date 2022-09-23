@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ImageBackground, Image, TextInput, Pressable } from 'react-native';
 import React, { useState, useContext } from 'react';
-import { getFirestore, setDoc, doc, updateDoc } from '@firebase/firestore';
+import { getFirestore, setDoc, doc, updateDoc, getDoc } from '@firebase/firestore';
 import { UserContext } from '../UserContext';
 import { useFonts } from 'expo-font';
 import { Audio } from 'expo-av';
@@ -84,7 +84,7 @@ const AddTask = ({ navigation }) => {
                 style={styles.bg}
             >
                 <View style={styles.banner}>
-                    <Text style={styles.bannerText}>ADD TASK</Text>
+                    <Text style={styles.bannerText}>ADD QUEST</Text>
                 </View>
                 <View style={styles.inputFieldsContainer}>
                     <ImageBackground

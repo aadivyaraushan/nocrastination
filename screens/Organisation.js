@@ -1,19 +1,36 @@
 import { ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { OrganisationContext } from '../OrganisationContext';
 import Topbar from '../components/Topbar';
 import BottomBar from '../components/BottomBar';
 import { useFonts } from 'expo-font';
 import Button from '../components/Button.js';
+import { UserContext } from '../UserContext';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { NavigationContainer } from '@react-navigation/native';
 
-const Organisation = () => {
+const Organisation = ({ navigation }) => {
     const { organisation, setOrganisation } = useContext(OrganisationContext);
+    const { user, setUser } = useContext(UserContext);
 
     const [] = useFonts({
         RetroGaming: require('../assets/fonts/RetroGaming-Regular.ttf'),
         InkyThinPixels: require('../assets/fonts/InkyThinPixels-Regular.ttf'),
         PlayMeGames: require('../assets/fonts/Playmegames-Regular.ttf')
     });
+
+    const joinOrganisation = async () => {
+        const id = organisation.name.replace(/\s+/g, '-').toLowerCase();
+        await updateDoc(doc(db, `organisations/${id}`), {
+            members: [...organisation.members, user.email]
+        });
+        await updateDoc(doc(db, `users/${user.email}`), {
+            organisation: id
+        });
+        navigation.navigate('organisationPage');
+        console.log('Joined organisation');
+    };
 
     return (
         <View>
@@ -63,7 +80,15 @@ const Organisation = () => {
                     </Text>
                 </ImageBackground>
                 <View style={{ marginTop: 40 }}>
-                    <Button onPress={() => alert('Joining organisation')}>JOIN</Button>
+                    <Button
+                        onPress={joinOrganisation}
+                        disabled={
+                            organisation.requirements.minLevel != user.level ||
+                            organisation.requirements.minCoins > user.coins
+                        }
+                    >
+                        JOIN
+                    </Button>
                 </View>
                 <BottomBar />
             </ImageBackground>

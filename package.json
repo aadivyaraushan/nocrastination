@@ -11,13 +11,16 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.18.9",
     "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.2",
     "expo": "~44.0.0",
     "expo-av": "~10.2.0",
     "expo-font": "~10.0.4",
+    "expo-keep-awake": "~10.0.1",
     "expo-navigation-bar": "~1.1.1",
+    "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",
     "expo-updates": "~0.11.7",
     "firebase": "^9.6.10",
@@ -25,13 +28,14 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-countdown-component": "^2.7.1",
-    "react-native-firebase": "^5.6.0",
+    "react-native-get-random-values": "^1.8.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-system-navigation-bar": "^1.0.4",
     "react-native-web": "0.17.1",
     "redux": "^4.1.2",
-    "redux-thunk": "^2.4.1"
+    "redux-thunk": "^2.4.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -69,6 +69,7 @@ function Signup({ navigation }) {
                 lastLoggedIn: Timestamp.now(),
                 loginStreak: 0,
                 level: 1,
+                organisation: '',
                 questsDone: 0,
                 tasks: [],
                 winstreak: 0

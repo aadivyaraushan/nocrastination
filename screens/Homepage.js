@@ -38,7 +38,7 @@ function Homepage({ navigation }) {
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require('/home/aadivyaraushan/Documents/GitHub/nocrastination/assets/backgrounds/homepageBG.png')}
+                source={require('../assets/backgrounds/homepageBG.png')}
                 style={styles.bg}
             >
                 <Topbar />
