@@ -1,18 +1,18 @@
-import {Alert, ImageBackground, StyleSheet, Text, View} from 'react-native';
-import {useContext, useEffect, useMemo, useState} from 'react';
-import {QuestContext} from '../QuestContext';
-import {useFonts} from 'expo-font';
+import { Alert, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { QuestContext } from '../QuestContext';
+import { useFonts } from 'expo-font';
 import * as NavigationBar from 'expo-navigation-bar';
-import {setStatusBarHidden} from 'expo-status-bar';
-import {UserContext} from '../UserContext';
-import {deleteDoc, doc, getDoc, updateDoc} from 'firebase/firestore';
-import {db} from '../firebase';
-import {useKeepAwake} from 'expo-keep-awake';
+import { setStatusBarHidden } from 'expo-status-bar';
+import { UserContext } from '../UserContext';
+import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { useKeepAwake } from 'expo-keep-awake';
 
-const QuestActive = ({route, navigation}) => {
+const QuestActive = ({ route, navigation }) => {
     useKeepAwake();
     const rewardData = route.params;
-    const {user, setUser} = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const [] = useFonts({
         RetroGaming: require('../assets/fonts/RetroGaming-Regular.ttf'),
         InkyThinPixels: require('../assets/fonts/InkyThinPixels-Regular.ttf'),
@@ -30,7 +30,7 @@ const QuestActive = ({route, navigation}) => {
         []
     );
 
-    const {quest, setQuest} = useContext(QuestContext);
+    const { quest, setQuest } = useContext(QuestContext);
     const [time, setTime] = useState(quest['duration']);
     const isGameOver = time === 0;
     const [loaded] = useFonts({
@@ -47,10 +47,8 @@ const QuestActive = ({route, navigation}) => {
         tasks.splice(tasks.indexOf(quest.title), 1);
         setUser((user) => ({
             ...user,
-            coins:
-                user.coins + multiplierCoins * rewardData[quest.difficulty].coins,
-            currentXp:
-                user.currentXp + multiplierXP * rewardData[quest.difficulty].xp,
+            coins: user.coins + multiplierCoins * rewardData[quest.difficulty].coins,
+            currentXp: user.currentXp + multiplierXP * rewardData[quest.difficulty].xp,
             questsDone: user.questsDone + 1,
             tasks
         }));
@@ -70,7 +68,7 @@ const QuestActive = ({route, navigation}) => {
                 navigation.navigate('homepage');
                 // console.log('deleteDoc for quest');
             });
-    }
+    };
     useEffect(() => {
         setIntervalId(
             setInterval(() => {
@@ -100,11 +98,12 @@ const QuestActive = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
-        console.log('isGameOver: ', isGameOver);
+        console.log('quest.subTasks: ', quest.subTasks);
         navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
             console.log('navigation called');
-            if (isGameOver === true || time === 0) {
+            console.log('time when navigation called: ', time);
+            if (quest.subTasks.length === 0 || time <= 0) {
                 console.log('game is over');
                 navigation.dispatch(e.data.action);
                 return;
@@ -112,43 +111,53 @@ const QuestActive = ({route, navigation}) => {
             console.log("Game isn't over");
             Alert.alert('You cannot leave until the quest is complete!', '', [
                 {
-                    text: 'OK', onPress: () => {
-                    }
+                    text: 'OK',
+                    onPress: () => {}
                 }
             ]);
             console.log('alert sent');
         });
-    }, [isGameOver, navigation]);
+    }, [isGameOver, navigation, quest]);
 
     useEffect(() => {
-        if (time === 0) {
-            clearInterval(intervalId);
-            Alert.alert('Quest Completed?', 'Have you completed the quest?', [
-                {
-                    text: 'Yes',
-                    onPress: () => {
-                        Alert.alert('Quest completed! You will now receive the rewards.');
-                        questComplete();
-                    }
-                },
-                {
-                    text: 'No',
-                    onPress: () => {
-                        Alert.alert("You won't be getting the rewards. Good try.");
-                        // setIsGameOver(true);
-                        navigation.navigate('homepage');
-                    }
-                }
-            ]);
+        if (quest.subTasks.length === 0) {
+            Alert.alert('Quest completed! You will now receive the rewards.');
 
-            NavigationBar.setVisibilityAsync('visible').then(() => setStatusBarHidden(false));
+            questComplete();
+        } else if (time === 0 && quest.subTasks.length !== 0) {
+            Alert.alert("You won't be getting the awards. Good try.");
+            navigation.navigate('homepage');
         }
-    }, [time]);
+    }, [time, quest]);
+
+    // useEffect(() => {
+    //     if (time === 0) {
+    //         clearInterval(intervalId);
+
+    //         Alert.alert('Quest Completed?', 'Have you completed the quest?', [
+    //             {
+    //                 text: 'Yes',
+    //                 onPress: () => {
+    //                     Alert.alert('Quest completed! You will now receive the rewards.');
+    //                     questComplete();
+    //                 }
+    //             },
+    //             {
+    //                 text: 'No',
+    //                 onPress: () => {
+    //                     Alert.alert("You won't be getting the rewards. Good try.");
+    //                     // setIsGameOver(true);
+    //                     navigation.navigate('homepage');
+    //                 }
+    //             }
+    //         ]);
+
+    //     }
+    // }, [time]);
 
     useEffect(() => {
         console.log(quest);
     }, [quest]);
-
 
     return (
         <View>
@@ -164,15 +173,24 @@ const QuestActive = ({route, navigation}) => {
                 <Text style={styles.timerText}>
                     {Math.floor(time / 60) + ':' + Math.round(time % 60)}
                 </Text>
-                <View>
-                    {quest.subTasks.map((subTask) => {
-                        return (
-                            <ImageBackground style={styles.subTaskContainer}
-                                             source={require('../assets/backgrounds/panels/shopPanel.png')}>
-                                <Text style={styles.subTaskText}>{subTask}</Text>
-                            </ImageBackground>
-                        );
-                    })}
+                <View style={{ flexwidth: '50%', height: '30%', width: '100%' }}>
+                    <ImageBackground
+                        style={styles.subTaskContainer}
+                        source={require('../assets/backgrounds/panels/shopPanel.png')}
+                    >
+                        {quest.subTasks.map((subTask) => {
+                            return (
+                                <Text
+                                    style={styles.subTaskText}
+                                    onPress={() => {
+                                        quest.subTasks.splice(quest.subTasks.indexOf(subTask), 1);
+                                    }}
+                                >
+                                    □ {subTask}
+                                </Text>
+                            );
+                        })}
+                    </ImageBackground>
                 </View>
             </ImageBackground>
         </View>
@@ -193,7 +211,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         width: '100%',
         color: 'white',
-        fontFamily: 'PlayMeGames'
+        fontFamily: 'PlayMeGames',
+        flex: 1
         // if i is even then it should be to the right else to the left
     },
     timerText: {
@@ -205,13 +224,12 @@ const styles = StyleSheet.create({
         fontFamily: 'PlayMeGames'
     },
     subTaskText: {
-        fontSize: 25,
+        fontSize: 35,
         color: 'white',
         fontFamily: 'PlayMeGames',
         top: 0,
         left: 0,
         position: 'relative'
-
     },
     subTaskContainer: {
         flex: 1,

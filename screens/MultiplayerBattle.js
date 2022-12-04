@@ -1,20 +1,29 @@
-import {Alert, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {QuestContext} from '../QuestContext';
-import {GameContext} from '../GameContext';
+import {
+    Alert,
+    Image,
+    ImageBackground,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { QuestContext } from '../QuestContext';
+import { GameContext } from '../GameContext';
 import HealthBar from '../components/HealthBar';
-import {UserContext} from '../UserContext';
-import {deleteDoc, doc, updateDoc} from '@firebase/firestore';
-import {db, rtdb} from '../firebase';
-import {Audio} from 'expo-av';
-import {useFonts} from 'expo-font';
-import {child, get, onValue, ref, remove, set, update} from 'firebase/database';
+import { UserContext } from '../UserContext';
+import { deleteDoc, doc, updateDoc, getDoc } from '@firebase/firestore';
+import { db, rtdb } from '../firebase';
+import { Audio } from 'expo-av';
+import { useFonts } from 'expo-font';
+import { child, get, onValue, ref, remove, set, update } from 'firebase/database';
 
-const MultiplayerBattle = ({route, navigation}) => {
+const MultiplayerBattle = ({ route, navigation }) => {
     // Declaration of necessary context
-    const {user, setUser} = useContext(UserContext);
-    const {quest, setQuest} = useContext(QuestContext);
-    const {game, setGame} = useContext(GameContext);
+    const { user, setUser } = useContext(UserContext);
+    const { quest, setQuest } = useContext(QuestContext);
+    const { game, setGame } = useContext(GameContext);
 
     // Declaration of necessary data
     const rewardData = route.params;
@@ -74,25 +83,25 @@ const MultiplayerBattle = ({route, navigation}) => {
 
     // Sound functions
     async function playDamaged() {
-        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/damaged.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/damaged.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playVictory() {
-        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/victory.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/victory.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playDefeat() {
-        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/defeat.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/defeat.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
 
     async function playAttack() {
-        const {sound} = await Audio.Sound.createAsync(require('../assets/sfx/attack.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sfx/attack.mp3'));
         setSound(sound);
         await sound.playAsync();
     }
@@ -168,7 +177,7 @@ const MultiplayerBattle = ({route, navigation}) => {
                     coins:
                         user['coins'] +
                         winstreakMultiplier *
-                        (multiplierCoins * rewardData[quest['difficulty']]['coins']),
+                            (multiplierCoins * rewardData[quest['difficulty']]['coins']),
                     currentXp:
                         user['currentXp'] +
                         winstreakMultiplier * (multiplierXP * rewardData[quest['difficulty']]['xp'])
@@ -221,8 +230,8 @@ const MultiplayerBattle = ({route, navigation}) => {
             if (!isGameOver) {
                 Alert.alert('You cannot leave until the quest is complete!', '', [
                     {
-                        text: 'OK', onPress: () => {
-                        }
+                        text: 'OK',
+                        onPress: () => {}
                     }
                 ]);
             } else if (isGameOver) {
@@ -255,6 +264,7 @@ const MultiplayerBattle = ({route, navigation}) => {
     // );
     const [emotesJSX, setEmotesJSX] = useState(<></>);
     const [subTasks, setSubTasks] = useState([]);
+    const [enemySubTaskNumber, setEnemySubTaskNumber] = useState(0);
     const [health1, setHealth1] = useState();
     const [health2, setHealth2] = useState();
     const [player1Avatar, setPlayer1Avatar] = useState();
@@ -264,10 +274,10 @@ const MultiplayerBattle = ({route, navigation}) => {
     const [subTasks1, setSubTasks1] = useState(<></>);
     const [subTasks2, setSubTasks2] = useState(<></>);
     const [lowerHealthBar, setLowerHealthBar] = useState(
-        <HealthBar health={health1} isLower={true}/>
+        <HealthBar health={health1} isLower={true} />
     );
     const [upperHealthBar, setUpperHealthBar] = useState(
-        <HealthBar health={health2} isLower={false}/>
+        <HealthBar health={health2} isLower={false} />
     );
     useEffect(() => {
         // Declaring isPlayerOne
@@ -280,8 +290,13 @@ const MultiplayerBattle = ({route, navigation}) => {
         // Getting subTasks one time
         get(child(ref(rtdb), `games/${game}/subTasks`)).then((snapshot) => {
             if (snapshot.exists()) {
-                if (isPlayerOne) setSubTasks(snapshot.val()['player1']);
-                else setSubTasks(snapshot.val()['player2']);
+                if (isPlayerOne) {
+                    setSubTasks(snapshot.val()['player1']);
+                    setEnemySubTaskNumber(snapshot.val()['player2'].length);
+                } else {
+                    setSubTasks(snapshot.val()['player2']);
+                    setEnemySubTaskNumber(snapshot.val()['player1'].length);
+                }
                 console.log('Extracted subTasks');
             }
 
@@ -293,9 +308,14 @@ const MultiplayerBattle = ({route, navigation}) => {
                         ? snapshot.val()['player1']
                         : snapshot.val()['player2'];
                     console.log('subTasksTemp: ', subTasksTemp);
+                    const enemySubTasksNumberTemp = isPlayerOne
+                        ? snapshot.val()['player2'].length
+                        : snapshot.val()['player1'].length;
                     // if (isPlayerOne) setSubTasks(snapshot.val()["player1"]);
                     // else setSubTasks(snapshot.val()["player2"]);
+                    console.log('number of sub tasks of enemy: ', enemySubTasksNumberTemp);
                     setSubTasks(subTasksTemp);
+                    setEnemySubTaskNumber(enemySubTasksNumberTemp);
                 }
             });
         });
@@ -438,8 +458,8 @@ const MultiplayerBattle = ({route, navigation}) => {
         } else if (health2 <= 0) {
             playerWin();
         }
-        setUpperHealthBar(<HealthBar health={health2} isLower={false}/>);
-        setLowerHealthBar(<HealthBar health={health1} isLower={true}/>);
+        setUpperHealthBar(<HealthBar health={health2} isLower={false} />);
+        setLowerHealthBar(<HealthBar health={health1} isLower={true} />);
     }, [health1, health2]);
 
     useEffect(() => {
@@ -504,7 +524,11 @@ const MultiplayerBattle = ({route, navigation}) => {
                     </>
                 );
             }
-            setSubTasks2(<Text style={styles.text}>...</Text>);
+            const subTasks2Temp = new Array(enemySubTaskNumber).fill(
+                <Text style={styles.text}>□ ...</Text>
+            );
+            console.log('subTasks2Temp: ', subTasks2Temp);
+            setSubTasks2(subTasks2Temp);
         }
     }, [subTasks, health2]);
 
@@ -534,7 +558,7 @@ const MultiplayerBattle = ({route, navigation}) => {
                     onPress={() => setEmotePressed(emoteName)}
                     // disabled={!(health2 <= 0 || health1 <= 0)}
                 >
-                    <Image key={index} source={emote} style={styles.emote}/>
+                    <Image key={index} source={emote} style={styles.emote} />
                 </Pressable>
             );
         });
@@ -581,9 +605,9 @@ const MultiplayerBattle = ({route, navigation}) => {
                     </ImageBackground>
                 </View>
                 {upperHealthBar}
-                <Image style={styles.upperAvatar} source={player2Avatar}/>
+                <Image style={styles.upperAvatar} source={player2Avatar} />
                 {/* {player2Emote} */}
-                <Image style={styles.lowerAvatar} source={player1Avatar}/>
+                <Image style={styles.lowerAvatar} source={player1Avatar} />
                 {/* {player1Emote} */}
                 {lowerHealthBar}
             </ImageBackground>
@@ -643,7 +667,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginBottom: 100,
         resizeMode: 'contain',
-        transform: [{scaleX: -1}],
+        transform: [{ scaleX: -1 }],
         bottom: '30%'
     },
     upperAvatar: {
